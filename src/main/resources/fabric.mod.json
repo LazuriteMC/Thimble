@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "id": "thimble",
+  "version": "${version}",
+
+  "name": "Thimble",
+  "description": "An improved data tracker system for Minecraft.",
+  "authors": [
+    "Lazurite Team"
+  ],
+  "contact": {
+    "homepage": "",
+    "sources": "https://github.com/lazuritemc/thimble"
+  },
+
+  "license": "MIT",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "dev.lazurite.thimble.ServerInitializer"
+    ]
+  },
+  "mixins": [
+    "thimble.mixins.json"
+  ],
+
+  "depends": {
+    "fabricloader": ">=0.7.4",
+    "fabric": "*",
+    "minecraft": "1.16.x"
+  },
+  "suggests": {
+    "flamingo": "*"
+  }
+}
