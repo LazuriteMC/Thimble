@@ -1,8 +1,9 @@
 package dev.lazurite.thimble.synchronizer;
 
-import net.minecraft.client.util.math.Vector3f;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.PacketByteBuf;
+
+import java.util.UUID;
 
 public class SynchronizedTypes {
     public static final SynchronizedType<Boolean> BOOLEAN = new SynchronizedType<Boolean>() {
@@ -24,6 +25,11 @@ public class SynchronizedTypes {
         @Override
         public Boolean fromTag(CompoundTag tag, String key) {
             return tag.getBoolean(key);
+        }
+
+        @Override
+        public Boolean copy(Boolean value) {
+            return value;
         }
 
         @Override
@@ -54,6 +60,11 @@ public class SynchronizedTypes {
         }
 
         @Override
+        public Float copy(Float value) {
+            return value;
+        }
+
+        @Override
         public Class<Float> getClassType() {
             return Float.class;
         }
@@ -81,39 +92,45 @@ public class SynchronizedTypes {
         }
 
         @Override
+        public Integer copy(Integer value) {
+            return value;
+        }
+
+        @Override
         public Class<Integer> getClassType() {
             return int.class;
         }
     };
 
-    public static final SynchronizedType<Vector3f> VECTOR3F = new SynchronizedType<Vector3f>() {
+    public static final SynchronizedType<UUID> UUID = new SynchronizedType<java.util.UUID>() {
         @Override
-        public void write(PacketByteBuf buf, Vector3f value) {
-            buf.writeFloat(value.getX());
-            buf.writeFloat(value.getY());
-            buf.writeFloat(value.getZ());
+        public void write(PacketByteBuf buf, java.util.UUID value) {
+            buf.writeUuid(value);
         }
 
         @Override
-        public Vector3f read(PacketByteBuf buf) {
-            return new Vector3f(buf.readFloat(), buf.readFloat(), buf.readFloat());
+        public java.util.UUID read(PacketByteBuf buf) {
+            return buf.readUuid();
         }
 
         @Override
-        public void toTag(CompoundTag tag, String key, Vector3f value) {
-            tag.putFloat(key + "x", value.getX());
-            tag.putFloat(key + "y", value.getY());
-            tag.putFloat(key + "z", value.getZ());
+        public void toTag(CompoundTag tag, String key, java.util.UUID value) {
+            tag.putUuid(key, value);
         }
 
         @Override
-        public Vector3f fromTag(CompoundTag tag, String key) {
-            return new Vector3f(tag.getFloat(key + "x"), tag.getFloat(key + "y"), tag.getFloat(key + "z"));
+        public java.util.UUID fromTag(CompoundTag tag, String key) {
+            return tag.getUuid(key);
         }
 
         @Override
-        public Class<Vector3f> getClassType() {
-            return Vector3f.class;
+        public java.util.UUID copy(java.util.UUID value) {
+            return UUID.copy(value);
+        }
+
+        @Override
+        public Class<java.util.UUID> getClassType() {
+            return UUID.class;
         }
     };
 }
