@@ -8,6 +8,7 @@
   "authors": [
     "Lazurite Team"
   ],
+
   "contact": {
     "homepage": "",
     "sources": "https://github.com/lazuritemc/thimble"
@@ -17,9 +18,13 @@
   "environment": "*",
   "entrypoints": {
     "main": [
-      "dev.lazurite.thimble.ServerInitializer"
+      "dev.lazurite.thimble.server.ServerInitializer"
+    ],
+    "client": [
+      "dev.lazurite.thimble.client.ClientInitializer"
     ]
   },
+
   "mixins": [
     "thimble.mixins.json"
   ],
@@ -29,6 +34,7 @@
     "fabric": "*",
     "minecraft": "1.16.x"
   },
+
   "suggests": {
     "flamingo": "*"
   }

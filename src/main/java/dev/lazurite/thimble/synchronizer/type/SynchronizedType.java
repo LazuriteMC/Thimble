@@ -1,4 +1,4 @@
-package dev.lazurite.thimble.synchronizer;
+package dev.lazurite.thimble.synchronizer.type;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.PacketByteBuf;

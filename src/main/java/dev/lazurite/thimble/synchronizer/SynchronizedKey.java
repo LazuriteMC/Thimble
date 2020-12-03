@@ -1,6 +1,7 @@
 package dev.lazurite.thimble.synchronizer;
 
 import dev.lazurite.thimble.component.Component;
+import dev.lazurite.thimble.synchronizer.type.SynchronizedType;
 
 import java.util.UUID;
 import java.util.function.BiConsumer;

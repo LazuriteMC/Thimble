@@ -1,34 +1,27 @@
 package dev.lazurite.thimble.synchronizer;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import dev.lazurite.thimble.component.Component;
-import net.minecraft.server.world.ServerWorld;
+import dev.lazurite.thimble.server.ServerInitializer;
 
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 public class Synchronizer {
-    private static final List<Synchronizer> synchronizers = Lists.newArrayList();
-
     private final Map<UUID, Entry<?>> entries = Maps.newHashMap();
     private final Component<?> component;
 
-    public static void tick(ServerWorld world) {
-        for (Synchronizer synchronizer : synchronizers) {
-            synchronizer.entries.forEach((uuid, entry) -> {
-                if (entry.dirty) {
-                    // send packet
-                }
-            });
-        }
+    public Synchronizer(Component<?> component) {
+        ServerInitializer.synchronizerRegistry.add(this);
+        this.component = component;
     }
 
-    public Synchronizer(Component<?> component) {
-        this.component = component;
-
-        synchronizers.add(this);
+    public void tick() {
+        this.entries.forEach((uuid, entry) -> {
+            if (entry.dirty) {
+                // send packet
+            }
+        });
     }
 
     public <T> void track(SynchronizedKey<T> key) {
@@ -56,10 +49,6 @@ public class Synchronizer {
         return entry.getValue();
     }
 
-    public static List<Synchronizer> getAll() {
-        return Lists.newArrayList(synchronizers);
-    }
-
     public static class Entry<T> {
         private final SynchronizedKey<T> key;
         private final T value;
@@ -75,7 +64,7 @@ public class Synchronizer {
         }
 
         public T getValue() {
-            return this.value;
+            return key.getType().copy(this.value);
         }
     }
 }
