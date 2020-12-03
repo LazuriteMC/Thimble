@@ -1,8 +1,9 @@
 package dev.lazurite.thimble.component;
 
 import dev.lazurite.thimble.synchronizer.Synchronizer;
+import net.minecraft.entity.Entity;
 
-public abstract class Component<T> {
+public abstract class Component<T extends Entity> {
     private final Synchronizer synchronizer;
     private boolean destroyed = false;
     private final T owner;
@@ -14,8 +15,6 @@ public abstract class Component<T> {
     }
 
     public abstract void tick();
-
-    public abstract void initSynchronizer();
 
     public Synchronizer getSynchronizer() {
         return synchronizer;
@@ -32,4 +31,6 @@ public abstract class Component<T> {
     public boolean isDestroyed() {
         return destroyed;
     }
+
+    public abstract void initSynchronizer();
 }

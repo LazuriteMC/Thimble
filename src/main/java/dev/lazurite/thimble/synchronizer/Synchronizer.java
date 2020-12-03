@@ -2,7 +2,7 @@ package dev.lazurite.thimble.synchronizer;
 
 import com.google.common.collect.Maps;
 import dev.lazurite.thimble.component.Component;
-import dev.lazurite.thimble.server.ServerInitializer;
+import dev.lazurite.thimble.side.server.ServerInitializer;
 
 import java.util.Map;
 import java.util.UUID;
@@ -22,6 +22,10 @@ public class Synchronizer {
                 // send packet
             }
         });
+    }
+
+    public Component<?> getComponent() {
+        return this.component;
     }
 
     public <T> void track(SynchronizedKey<T> key) {

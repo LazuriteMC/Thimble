@@ -1,4 +1,4 @@
-package dev.lazurite.thimble.client;
+package dev.lazurite.thimble.side.client;
 
 import dev.lazurite.thimble.registry.ComponentRegistry;
 import dev.lazurite.thimble.registry.SynchronizerRegistry;

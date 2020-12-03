@@ -21,6 +21,12 @@ public class SynchronizerRegistry implements TickableList<Synchronizer> {
 
     @Override
     public void tick() {
-        synchronizers.forEach(Synchronizer::tick);
+        for (Synchronizer synchronizer : synchronizers) {
+            if (synchronizer.getComponent().isDestroyed()) {
+                synchronizers.remove(synchronizer);
+            } else {
+                synchronizer.tick();
+            }
+        }
     }
 }
