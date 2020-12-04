@@ -1,15 +1,14 @@
 package dev.lazurite.thimble.synchronizer;
 
 import dev.lazurite.thimble.component.Component;
-import dev.lazurite.thimble.synchronizer.type.SynchronizedType;
 
 import java.util.UUID;
 import java.util.function.BiConsumer;
 
 public class SynchronizedKey<T> {
+    private BiConsumer<Component<?>, T> consumer;
     private final SynchronizedType<T> type;
     private final T fallback;
-    private BiConsumer<Component<?>, T> consumer;
     private UUID uuid;
 
     public SynchronizedKey(SynchronizedType<T> type, T fallback) {

@@ -10,3 +10,6 @@ pluginManagement {
 }
 
 rootProject.name = 'thimble'
+
+include "examplemod"
+project(":examplemod").projectDir = file("examplemod")

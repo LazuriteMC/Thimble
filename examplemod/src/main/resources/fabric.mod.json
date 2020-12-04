@@ -1,16 +1,16 @@
 {
   "schemaVersion": 1,
-  "id": "thimble",
+  "id": "examplemod",
   "version": "${version}",
 
-  "name": "Thimble",
-  "description": "An improved data tracker system for Minecraft.",
+  "name": "Thibmle Example Mod",
+  "description": "Example mod for Thimble",
   "authors": [
     "Lazurite Team"
   ],
 
   "contact": {
-    "website": "https://lazurite.dev",
+    "homepage": "https://lazurite.dev",
     "sources": "https://github.com/lazuritemc/thimble"
   },
 
@@ -18,16 +18,9 @@
   "environment": "*",
   "entrypoints": {
     "main": [
-      "dev.lazurite.thimble.server.ServerInitializer"
-    ],
-    "client": [
-      "dev.lazurite.thimble.client.ClientInitializer"
+      "dev.lazurite.thimble.example.ServerInitializer"
     ]
   },
-
-  "mixins": [
-    "thimble.mixins.json"
-  ],
 
   "depends": {
     "fabricloader": ">=0.7.4",

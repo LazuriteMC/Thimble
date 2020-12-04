@@ -5,7 +5,6 @@ import net.minecraft.entity.Entity;
 
 public abstract class Component<T extends Entity> {
     private final Synchronizer synchronizer;
-    private boolean destroyed = false;
     private final T owner;
 
     public Component(T owner) {
@@ -22,14 +21,6 @@ public abstract class Component<T extends Entity> {
 
     public T getOwner() {
         return owner;
-    }
-
-    public void destroy() {
-        destroyed = true;
-    }
-
-    public boolean isDestroyed() {
-        return destroyed;
     }
 
     public abstract void initSynchronizer();

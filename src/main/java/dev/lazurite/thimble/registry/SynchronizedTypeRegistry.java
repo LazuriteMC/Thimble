@@ -1,11 +1,16 @@
-package dev.lazurite.thimble.synchronizer.type;
+package dev.lazurite.thimble.registry;
 
+import com.google.common.collect.Maps;
+import dev.lazurite.thimble.synchronizer.SynchronizedType;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.PacketByteBuf;
 
+import java.util.Map;
 import java.util.UUID;
 
-public class SynchronizedTypes {
+public class SynchronizedTypeRegistry {
+    private static final Map<UUID, SynchronizedType<?>> entries = Maps.newHashMap();
+
     public static final SynchronizedType<Boolean> BOOLEAN = new SynchronizedType<Boolean>() {
         @Override
         public void write(PacketByteBuf buf, Boolean value) {
@@ -133,4 +138,23 @@ public class SynchronizedTypes {
             return UUID.class;
         }
     };
+
+    public static <T> void register(SynchronizedType<T> synchronizedType) {
+        entries.put(java.util.UUID.randomUUID(), synchronizedType);
+    }
+
+    public static SynchronizedType<?> get(UUID uuid) {
+        return entries.get(uuid);
+    }
+
+    public static <T> UUID get(SynchronizedType<T> synchronizedType) {
+        return entries.values().;
+    }
+
+    static {
+        register(BOOLEAN);
+        register(INTEGER);
+        register(FLOAT);
+        register(UUID);
+    }
 }
