@@ -148,7 +148,8 @@ public class SynchronizedTypeRegistry {
     }
 
     public static <T> UUID get(SynchronizedType<T> synchronizedType) {
-        return entries.values().;
+        return null;
+//        return entries.values().;
     }
 
     static {

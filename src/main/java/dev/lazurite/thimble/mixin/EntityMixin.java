@@ -6,11 +6,12 @@ import net.minecraft.entity.Entity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(Entity.class)
 public class EntityMixin {
-    @Inject(method = "tick", at = @At("TAIL"))
-    public void tick() {
+    @Inject(method = "tick()V", at = @At("HEAD"))
+    public void tick(CallbackInfo info) {
         ComponentRegistry.get((Entity) (Object) this).forEach(Component::tick);
     }
 }

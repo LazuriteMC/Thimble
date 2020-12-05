@@ -18,10 +18,10 @@
   "environment": "*",
   "entrypoints": {
     "main": [
-      "dev.lazurite.thimble.server.ServerInitializer"
+      "dev.lazurite.thimble.side.server.ServerInitializer"
     ],
     "client": [
-      "dev.lazurite.thimble.client.ClientInitializer"
+      "dev.lazurite.thimble.side.client.ClientInitializer"
     ]
   },
 
