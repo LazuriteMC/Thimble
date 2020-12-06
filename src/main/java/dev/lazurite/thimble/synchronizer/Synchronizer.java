@@ -3,16 +3,15 @@ package dev.lazurite.thimble.synchronizer;
 import com.google.common.collect.Maps;
 import dev.lazurite.thimble.component.Component;
 import dev.lazurite.thimble.side.server.ServerInitializer;
-import net.minecraft.network.PacketByteBuf;
 
 import java.util.Map;
 import java.util.UUID;
 
 public class Synchronizer {
     private final Map<UUID, Entry<?>> entries = Maps.newHashMap();
-    private final Component<?> component;
+    private final Component component;
 
-    public Synchronizer(Component<?> component) {
+    public Synchronizer(Component component) {
         ServerInitializer.synchronizerRegistry.add(this);
         this.component = component;
     }
@@ -54,7 +53,7 @@ public class Synchronizer {
         return this.entries;
     }
 
-    public Component<?> getComponent() {
+    public Component getComponent() {
         return this.component;
     }
 

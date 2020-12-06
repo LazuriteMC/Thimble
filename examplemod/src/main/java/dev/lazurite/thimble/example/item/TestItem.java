@@ -27,8 +27,10 @@ public class TestItem extends Item {
         if (!world.isClient()) {
             if (hitResult.getType() == HitResult.Type.BLOCK) {
                 CowEntity cowEntity = EntityType.COW.create(world);
+
                 cowEntity.updatePosition(hitResult.getPos().x, hitResult.getPos().y, hitResult.getPos().z);
-                ComponentRegistry.add(new CowComponent(cowEntity));
+                ComponentRegistry.register(new CowComponent(cowEntity));
+
                 world.spawnEntity(cowEntity);
 
                 itemStack.decrement(1);

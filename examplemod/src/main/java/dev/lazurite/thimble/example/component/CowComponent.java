@@ -1,10 +1,10 @@
 package dev.lazurite.thimble.example.component;
 
-import dev.lazurite.thimble.component.Component;
+import dev.lazurite.thimble.component.UniqueComponent;
 import net.minecraft.entity.passive.CowEntity;
 import net.minecraft.world.World;
 
-public class CowComponent extends Component<CowEntity> {
+public class CowComponent extends UniqueComponent<CowEntity> {
 
     public CowComponent(CowEntity owner) {
         super(owner);

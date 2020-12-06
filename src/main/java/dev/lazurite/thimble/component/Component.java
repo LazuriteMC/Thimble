@@ -1,27 +1,9 @@
 package dev.lazurite.thimble.component;
 
 import dev.lazurite.thimble.synchronizer.Synchronizer;
-import net.minecraft.entity.Entity;
 
-public abstract class Component<T extends Entity> {
-    private final Synchronizer synchronizer;
-    private final T owner;
-
-    public Component(T owner) {
-        this.owner = owner;
-        this.synchronizer = new Synchronizer(this);
-        this.initSynchronizer();
-    }
-
-    public abstract void tick();
-
-    public Synchronizer getSynchronizer() {
-        return synchronizer;
-    }
-
-    public T getOwner() {
-        return owner;
-    }
-
-    public abstract void initSynchronizer();
+public interface Component {
+    void tick();
+    Synchronizer getSynchronizer();
+    void initSynchronizer();
 }
