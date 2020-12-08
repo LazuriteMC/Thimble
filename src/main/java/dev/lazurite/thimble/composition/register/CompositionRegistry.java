@@ -1,6 +1,8 @@
-package dev.lazurite.thimble.composition;
+package dev.lazurite.thimble.composition.register;
 
 import com.google.common.collect.Lists;
+import dev.lazurite.thimble.composition.Composition;
+import dev.lazurite.thimble.synchronizer.Synchronizer;
 import dev.lazurite.thimble.util.IntMap;
 import net.minecraft.entity.Entity;
 
@@ -87,12 +89,18 @@ public class CompositionRegistry {
     }
 
     static class UniqueEntry<U extends Entity> {
+        private final Synchronizer synchronizer;
         private final Composition composition;
         private final U entity;
 
         public UniqueEntry(Composition composition, U entity) {
+            this.synchronizer = new Synchronizer();
             this.composition = composition;
             this.entity = entity;
+        }
+
+        public Synchronizer getSynchronizer() {
+            return this.synchronizer;
         }
 
         public Composition getComposition() {

@@ -1,31 +1,27 @@
-package dev.lazurite.thimble.synchronizer;
+package dev.lazurite.thimble.synchronizer.register;
 
 import com.google.common.collect.Maps;
 import dev.lazurite.thimble.synchronizer.Synchronizer;
-import dev.lazurite.thimble.util.TickableList;
 
 import java.util.Map;
 import java.util.UUID;
 
-public class SynchronizerRegistry implements TickableList<Synchronizer> {
-    private final Map<UUID, Synchronizer> synchronizers = Maps.newHashMap();
+public class SynchronizerRegistry {
+    private static final Map<UUID, Synchronizer> synchronizers = Maps.newHashMap();
 
-    @Override
-    public void add(Synchronizer entry) {
+    public static void add(Synchronizer entry) {
         synchronizers.put(UUID.randomUUID(), entry);
     }
 
-    public Synchronizer get(UUID uuid) {
+    public static Synchronizer get(UUID uuid) {
         return synchronizers.get(uuid);
     }
 
-    @Override
-    public void clear() {
+    public static void clear() {
         synchronizers.clear();
     }
 
-    @Override
-    public void tick() {
+    public static void tick() {
         for (Synchronizer synchronizer : synchronizers.values()) {
 //            if (synchronizer.getComponent().getOwner().removed) {
 //                synchronizers.remove(synchronizer);

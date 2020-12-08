@@ -1,6 +1,6 @@
 package dev.lazurite.thimble.example;
 
-import dev.lazurite.thimble.composition.CompositionRegistry;
+import dev.lazurite.thimble.composition.register.CompositionRegistry;
 import dev.lazurite.thimble.example.composition.FloatAwayComposition;
 import dev.lazurite.thimble.example.item.TestItem;
 import net.fabricmc.api.ModInitializer;

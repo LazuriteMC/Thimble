@@ -1,7 +1,7 @@
 package dev.lazurite.thimble.example.item;
 
 import dev.lazurite.thimble.example.composition.FloatAwayComposition;
-import dev.lazurite.thimble.composition.CompositionRegistry;
+import dev.lazurite.thimble.composition.register.CompositionRegistry;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.passive.CowEntity;
 import net.minecraft.entity.player.PlayerEntity;

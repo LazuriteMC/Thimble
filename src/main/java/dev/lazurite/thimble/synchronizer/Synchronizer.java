@@ -1,19 +1,16 @@
 package dev.lazurite.thimble.synchronizer;
 
 import com.google.common.collect.Maps;
-import dev.lazurite.thimble.composition.Composition;
-import dev.lazurite.thimble.side.server.ServerInitializer;
+import dev.lazurite.thimble.synchronizer.register.SynchronizerRegistry;
 
 import java.util.Map;
 import java.util.UUID;
 
 public class Synchronizer {
     private final Map<UUID, Entry<?>> entries = Maps.newHashMap();
-    private final Composition component;
 
-    public Synchronizer(Composition component) {
-        ServerInitializer.synchronizerRegistry.add(this);
-        this.component = component;
+    public Synchronizer() {
+        SynchronizerRegistry.add(this);
     }
 
     public void tick() {
@@ -44,6 +41,7 @@ public class Synchronizer {
         entries.replace(key.getUuid(), new Entry<>(key, value));
     }
 
+    @SuppressWarnings("unchecked")
     public <T> T get(SynchronizedKey<T> key) {
         Entry<T> entry = (Entry<T>) entries.get(key.getUuid());
         return entry.getValue();
@@ -51,10 +49,6 @@ public class Synchronizer {
 
     public Map<UUID, Entry<?>> getAll() {
         return this.entries;
-    }
-
-    public Composition getComponent() {
-        return this.component;
     }
 
     public static class Entry<T> {
