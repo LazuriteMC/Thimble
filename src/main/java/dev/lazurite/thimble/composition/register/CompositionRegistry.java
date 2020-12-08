@@ -45,7 +45,7 @@ public class CompositionRegistry {
 
         for (UniqueEntry<?> entry : uniqueRegistry.getAll()) {
             if (entry.getEntity().equals(entity)) {
-                out.add(entry.getComposition());
+                out.addAll(entry.getCompositions());
             }
         }
 
@@ -63,7 +63,7 @@ public class CompositionRegistry {
 
         for (GenericEntry<?> entry: genericRegistry.getAll()) {
             if (entry.getType().equals(type)) {
-                out.add(entry.getComposition());
+                out.addAll(entry.getCompositions());
             }
         }
 
@@ -71,16 +71,16 @@ public class CompositionRegistry {
     }
 
     static class GenericEntry<U extends Entity> {
-        private final Composition composition;
+        private final List<Composition> compositions = Lists.newArrayList();
         private final Class<U> type;
 
         public GenericEntry(Composition composition, Class<U> type) {
-            this.composition = composition;
+            this.compositions.add(composition);
             this.type = type;
         }
 
-        public Composition getComposition() {
-            return this.composition;
+        public List<Composition> getCompositions() {
+            return this.compositions;
         }
 
         public Class<U> getType() {
@@ -89,13 +89,13 @@ public class CompositionRegistry {
     }
 
     static class UniqueEntry<U extends Entity> {
+        private final List<Composition> compositions = Lists.newArrayList();
         private final Synchronizer synchronizer;
-        private final Composition composition;
         private final U entity;
 
         public UniqueEntry(Composition composition, U entity) {
             this.synchronizer = new Synchronizer();
-            this.composition = composition;
+            this.compositions.add(composition);
             this.entity = entity;
         }
 
@@ -103,8 +103,8 @@ public class CompositionRegistry {
             return this.synchronizer;
         }
 
-        public Composition getComposition() {
-            return this.composition;
+        public List<Composition> getCompositions() {
+            return this.compositions;
         }
 
         public U getEntity() {

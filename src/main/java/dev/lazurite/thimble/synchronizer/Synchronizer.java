@@ -25,14 +25,6 @@ public class Synchronizer {
         entries.put(key.getUuid(), new Entry<>(key, key.getFallback()));
     }
 
-    public <T> void track(SynchronizedKey<T> key, T value) {
-        if (value == null) {
-            entries.put(key.getUuid(), new Entry<>(key, key.getFallback()));
-        } else {
-            entries.put(key.getUuid(), new Entry<>(key, value));
-        }
-    }
-
     public <T> void set(SynchronizedKey<T> key, T value) {
         if (value == null) {
             return;

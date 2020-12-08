@@ -1,25 +1,26 @@
 package dev.lazurite.thimble.example.composition;
 
 import dev.lazurite.thimble.composition.Composition;
+import dev.lazurite.thimble.synchronizer.SynchronizedKey;
+import dev.lazurite.thimble.synchronizer.type.SynchronizedTypeRegistry;
 import net.minecraft.entity.Entity;
 import net.minecraft.world.World;
 
 public class FloatAwayComposition extends Composition {
-    private float rate;
+    public static final SynchronizedKey<Float> RATE = new SynchronizedKey<>(SynchronizedTypeRegistry.FLOAT, 1.0f);
 
     public FloatAwayComposition(float rate) {
-        super();
-        this.rate = rate;
+        getSynchronizer().set(RATE, rate);
     }
 
     @Override
     public void tick(Entity entity) {
         World world = entity.getEntityWorld();
 
-        System.out.println("TEST PRINT");
+        System.out.println("TEST PRINT: " + getSynchronizer().get(RATE));
 
         if (!world.isClient()) {
-            floatAway(entity, rate);
+            floatAway(entity, getSynchronizer().get(RATE));
         }
     }
 
@@ -29,6 +30,6 @@ public class FloatAwayComposition extends Composition {
 
     @Override
     public void initSynchronizer() {
-
+        getSynchronizer().track(RATE);
     }
 }

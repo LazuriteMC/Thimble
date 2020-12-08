@@ -11,7 +11,7 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.Identifier;
 
 public class RegisterUniqueCompS2C {
-    public static final Identifier PACKET_ID = new Identifier(ServerInitializer.MODID, "register_unique_comp_s2c");
+    public static final Identifier PACKET_ID = new Identifier(ServerInitializer.MODID, "register_composition_s2c");
 
     public static void accept(PacketContext context, PacketByteBuf buf) {
         int entityId = buf.readInt();
