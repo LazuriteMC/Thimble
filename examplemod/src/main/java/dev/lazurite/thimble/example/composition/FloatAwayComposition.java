@@ -7,7 +7,11 @@ import net.minecraft.entity.Entity;
 import net.minecraft.world.World;
 
 public class FloatAwayComposition extends Composition {
-    public static final SynchronizedKey<Float> RATE = new SynchronizedKey<>(SynchronizedTypeRegistry.FLOAT, 1.0f);
+    public static final SynchronizedKey<Float> RATE = new SynchronizedKey<>(SynchronizedTypeRegistry.FLOAT, 0.05f);
+
+    public FloatAwayComposition() {
+
+    }
 
     public FloatAwayComposition(float rate) {
         getSynchronizer().set(RATE, rate);

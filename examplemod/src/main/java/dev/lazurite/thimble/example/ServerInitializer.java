@@ -16,7 +16,7 @@ public class ServerInitializer implements ModInitializer {
     public static TestItem TEST_ITEM;
 
     static {
-        CompositionRegistry.register(new FloatAwayComposition(0.1f), CowEntity.class);
+        CompositionRegistry.register(new FloatAwayComposition(), CowEntity.class);
     }
 
     @Override
