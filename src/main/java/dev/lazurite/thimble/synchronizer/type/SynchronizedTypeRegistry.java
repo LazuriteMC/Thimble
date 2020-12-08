@@ -1,7 +1,6 @@
-package dev.lazurite.thimble.registry;
+package dev.lazurite.thimble.synchronizer.type;
 
 import com.google.common.collect.Maps;
-import dev.lazurite.thimble.synchronizer.SynchronizedType;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.PacketByteBuf;
 

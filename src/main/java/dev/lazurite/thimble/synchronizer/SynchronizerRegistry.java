@@ -1,4 +1,4 @@
-package dev.lazurite.thimble.registry;
+package dev.lazurite.thimble.synchronizer;
 
 import com.google.common.collect.Maps;
 import dev.lazurite.thimble.synchronizer.Synchronizer;
@@ -27,11 +27,11 @@ public class SynchronizerRegistry implements TickableList<Synchronizer> {
     @Override
     public void tick() {
         for (Synchronizer synchronizer : synchronizers.values()) {
-            if (synchronizer.getComponent().getOwner().removed) {
-                synchronizers.remove(synchronizer);
-            } else {
-                synchronizer.tick();
-            }
+//            if (synchronizer.getComponent().getOwner().removed) {
+//                synchronizers.remove(synchronizer);
+//            } else {
+//                synchronizer.tick();
+//            }
         }
     }
 }

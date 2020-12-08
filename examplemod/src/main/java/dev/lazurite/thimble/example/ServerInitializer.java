@@ -1,9 +1,10 @@
 package dev.lazurite.thimble.example;
 
-import dev.lazurite.thimble.example.component.CowComponent;
+import dev.lazurite.thimble.composition.CompositionRegistry;
+import dev.lazurite.thimble.example.composition.FloatAwayComposition;
 import dev.lazurite.thimble.example.item.TestItem;
-import dev.lazurite.thimble.registry.ComponentRegistry;
 import net.fabricmc.api.ModInitializer;
+import net.minecraft.entity.passive.CowEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.util.Identifier;
@@ -15,7 +16,7 @@ public class ServerInitializer implements ModInitializer {
     public static TestItem TEST_ITEM;
 
     static {
-        ComponentRegistry.register(CowComponent::new);
+        CompositionRegistry.register(new FloatAwayComposition(0.1f), CowEntity.class);
     }
 
     @Override

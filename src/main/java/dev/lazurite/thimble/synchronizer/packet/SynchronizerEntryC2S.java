@@ -1,6 +1,5 @@
 package dev.lazurite.thimble.synchronizer.packet;
 
-import dev.lazurite.thimble.registry.SynchronizedTypeRegistry;
 import dev.lazurite.thimble.side.server.ServerInitializer;
 import dev.lazurite.thimble.synchronizer.Synchronizer;
 import io.netty.buffer.Unpooled;

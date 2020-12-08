@@ -1,6 +1,6 @@
 package dev.lazurite.thimble.synchronizer.packet;
 
-import dev.lazurite.thimble.component.UniqueComponent;
+import dev.lazurite.thimble.composition.Composition;
 import dev.lazurite.thimble.side.server.ServerInitializer;
 import io.netty.buffer.Unpooled;
 import net.fabricmc.fabric.api.network.ClientSidePacketRegistry;
@@ -21,10 +21,10 @@ public class RegisterUniqueCompS2C {
         });
     }
 
-    public static <T extends Entity> void send(UniqueComponent<T> component) {
+    public static <T extends Entity> void send(Composition component) {
         PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
 
-        buf.writeInt(component.getOwner().getEntityId());
+//        buf.writeInt(component.getOwner().getEntityId());
 
         ClientSidePacketRegistry.INSTANCE.sendToServer(PACKET_ID, buf);
     }

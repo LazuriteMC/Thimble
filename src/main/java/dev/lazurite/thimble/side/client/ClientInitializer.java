@@ -1,6 +1,6 @@
 package dev.lazurite.thimble.side.client;
 
-import dev.lazurite.thimble.registry.SynchronizerRegistry;
+import dev.lazurite.thimble.synchronizer.SynchronizerRegistry;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 

@@ -1,7 +1,7 @@
 package dev.lazurite.thimble.example.item;
 
-import dev.lazurite.thimble.example.component.CowComponent;
-import dev.lazurite.thimble.registry.ComponentRegistry;
+import dev.lazurite.thimble.example.composition.FloatAwayComposition;
+import dev.lazurite.thimble.composition.CompositionRegistry;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.passive.CowEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -29,7 +29,7 @@ public class TestItem extends Item {
                 CowEntity cowEntity = EntityType.COW.create(world);
 
                 cowEntity.updatePosition(hitResult.getPos().x, hitResult.getPos().y, hitResult.getPos().z);
-                ComponentRegistry.register(new CowComponent(cowEntity));
+                CompositionRegistry.register(new FloatAwayComposition(0.2f), cowEntity);
 
                 world.spawnEntity(cowEntity);
 

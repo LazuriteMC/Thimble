@@ -1,12 +1,13 @@
 package dev.lazurite.thimble.synchronizer;
 
-import dev.lazurite.thimble.component.GenericComponent;
+import dev.lazurite.thimble.composition.Composition;
+import dev.lazurite.thimble.synchronizer.type.SynchronizedType;
 
 import java.util.UUID;
 import java.util.function.BiConsumer;
 
 public class SynchronizedKey<T> {
-    private BiConsumer<GenericComponent<?>, T> consumer;
+    private BiConsumer<Composition, T> consumer;
     private final SynchronizedType<T> type;
     private final T fallback;
     private UUID uuid;
@@ -17,7 +18,7 @@ public class SynchronizedKey<T> {
         this.uuid = UUID.randomUUID();
     }
 
-    public SynchronizedKey(SynchronizedType<T> type, T fallback, BiConsumer<GenericComponent<?>, T> consumer) {
+    public SynchronizedKey(SynchronizedType<T> type, T fallback, BiConsumer<Composition, T> consumer) {
         this(type, fallback);
         this.consumer = consumer;
     }
@@ -30,7 +31,7 @@ public class SynchronizedKey<T> {
         return this.fallback;
     }
 
-    public BiConsumer<GenericComponent<?>, T> getConsumer() {
+    public BiConsumer<Composition, T> getConsumer() {
         return this.consumer;
     }
 
