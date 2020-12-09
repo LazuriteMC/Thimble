@@ -17,4 +17,13 @@ public abstract class Composition {
 
     public abstract void tick(Entity entity);
     public abstract void initSynchronizer();
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Composition) {
+            return ((Composition) obj).getClass().equals(getClass());
+        }
+
+        return false;
+    }
 }

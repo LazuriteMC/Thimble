@@ -1,114 +1,53 @@
 package dev.lazurite.thimble.composition.register;
 
-import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import dev.lazurite.thimble.composition.Composition;
-import dev.lazurite.thimble.synchronizer.Synchronizer;
-import dev.lazurite.thimble.util.IntMap;
-import net.minecraft.entity.Entity;
+import dev.lazurite.thimble.composition.CompositionFactory;
 
-import java.util.List;
+import java.util.Map;
 
 /**
  * This is the place where every {@link Composition} is registered.
  * @author Ethan Johnson
  */
 public class CompositionRegistry {
-    private static final IntMap<GenericEntry<?>> genericRegistry = new IntMap<>();
-    private static final IntMap<UniqueEntry<?>> uniqueRegistry = new IntMap<>();
+    private static final Map<Integer, CompositionFactory> compositions = Maps.newHashMap();
+    private static int nextID;
 
-    /**
-     * Registers a unique {@link Composition} used on just one {@link Entity}.
-     * @param composition the {@link Composition}
-     */
-    public static void register(Composition composition, Entity entity) {
-        uniqueRegistry.add(new UniqueEntry<>(composition, entity));
+    public static void register(CompositionFactory factory) {
+        compositions.put(nextID, factory);
+        ++nextID;
     }
 
     /**
-     * Registers a generic {@link Composition} used on every {@link Entity} of that type.
-     * @param composition the {@link Composition}
+     * Gets the {@link Composition} associated with the given int.
+     * @return the {@link Composition}
      */
-    public static void register(Composition composition, Class<? extends Entity> type) {
-        genericRegistry.add(new GenericEntry<>(composition, type));
+    public static Composition get(int id) {
+        return compositions.get(id).create();
     }
 
     /**
-     * Gets all {@link Composition} objects associated with
-     * the given {@link Entity}. Returns an empty list if there
-     * are none.
-     * @param entity the {@link Entity} to find {@link Composition} objects for
-     * @return a list of {@link Composition} objects
+     * Gets the int associated with the given {@link Composition}.
+     * @return the int of the {@link Composition}
      */
-    @SuppressWarnings("unchecked")
-    public static List<Composition> get(Entity entity) {
-        List<Composition> out = Lists.newArrayList();
-
-        for (UniqueEntry<?> entry : uniqueRegistry.getAll()) {
-            if (entry.getEntity().equals(entity)) {
-                out.addAll(entry.getCompositions());
+    public static int get(Composition composition) {
+        for (Map.Entry<Integer, CompositionFactory> entry : compositions.entrySet()) {
+            if (entry.getValue().create().equals(composition)) {
+                return entry.getKey();
             }
         }
 
-        return out;
+        return -1;
     }
 
     /**
-     * Gets all {@link Composition} objects associated with
-     * the given class. Returns an empty list if there are none.
-     * @return a list of {@link Composition} objects
+     * This exception is typically used if the user tries to attach a
+     * {@link Composition} which isn't registered in {@link CompositionRegistry}.
      */
-    @SuppressWarnings("unchecked")
-    public static List<Composition> get(Class<? extends Entity> type) {
-        List<Composition> out = Lists.newArrayList();
-
-        for (GenericEntry<?> entry: genericRegistry.getAll()) {
-            if (entry.getType().equals(type)) {
-                out.addAll(entry.getCompositions());
-            }
-        }
-
-        return out;
-    }
-
-    static class GenericEntry<U extends Entity> {
-        private final List<Composition> compositions = Lists.newArrayList();
-        private final Class<U> type;
-
-        public GenericEntry(Composition composition, Class<U> type) {
-            this.compositions.add(composition);
-            this.type = type;
-        }
-
-        public List<Composition> getCompositions() {
-            return this.compositions;
-        }
-
-        public Class<U> getType() {
-            return this.type;
-        }
-    }
-
-    static class UniqueEntry<U extends Entity> {
-        private final List<Composition> compositions = Lists.newArrayList();
-        private final Synchronizer synchronizer;
-        private final U entity;
-
-        public UniqueEntry(Composition composition, U entity) {
-            this.synchronizer = new Synchronizer();
-            this.compositions.add(composition);
-            this.entity = entity;
-        }
-
-        public Synchronizer getSynchronizer() {
-            return this.synchronizer;
-        }
-
-        public List<Composition> getCompositions() {
-            return this.compositions;
-        }
-
-        public U getEntity() {
-            return this.entity;
+    public static class CompositionRegistryException extends RuntimeException {
+        public CompositionRegistryException(String errorMessage) {
+            super(errorMessage);
         }
     }
 }

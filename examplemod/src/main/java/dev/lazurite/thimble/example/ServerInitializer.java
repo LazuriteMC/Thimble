@@ -4,7 +4,6 @@ import dev.lazurite.thimble.composition.register.CompositionRegistry;
 import dev.lazurite.thimble.example.composition.FloatAwayComposition;
 import dev.lazurite.thimble.example.item.TestItem;
 import net.fabricmc.api.ModInitializer;
-import net.minecraft.entity.passive.CowEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.util.Identifier;
@@ -16,7 +15,8 @@ public class ServerInitializer implements ModInitializer {
     public static TestItem TEST_ITEM;
 
     static {
-        CompositionRegistry.register(new FloatAwayComposition(), CowEntity.class);
+        CompositionRegistry.register(FloatAwayComposition::new);
+//        CompositionAttachments.attach(new FloatAwayComposition(), PigEntity.class);
     }
 
     @Override

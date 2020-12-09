@@ -1,7 +1,6 @@
 package dev.lazurite.thimble.synchronizer;
 
 import com.google.common.collect.Maps;
-import dev.lazurite.thimble.synchronizer.register.SynchronizerRegistry;
 
 import java.util.Map;
 import java.util.UUID;
@@ -10,7 +9,7 @@ public class Synchronizer {
     private final Map<UUID, Entry<?>> entries = Maps.newHashMap();
 
     public Synchronizer() {
-        SynchronizerRegistry.add(this);
+
     }
 
     public void tick() {
@@ -41,6 +40,15 @@ public class Synchronizer {
 
     public Map<UUID, Entry<?>> getAll() {
         return this.entries;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Synchronizer) {
+            return ((Synchronizer) obj).getAll().equals(getAll());
+        }
+
+        return false;
     }
 
     public static class Entry<T> {
