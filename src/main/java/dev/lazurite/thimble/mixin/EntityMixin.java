@@ -15,7 +15,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import java.util.List;
 
 /**
- * This mixin mainly deals with executing {@link dev.lazurite.thimble.composition.Composition}
+ * This mixin mainly deals with executing {@link Composition}
  * code within the {@link Entity#tick()} method.
  */
 @Mixin(Entity.class)

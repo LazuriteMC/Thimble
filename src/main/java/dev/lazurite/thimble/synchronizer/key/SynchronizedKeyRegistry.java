@@ -28,4 +28,14 @@ public class SynchronizedKeyRegistry {
 
         return null;
     }
+
+    /**
+     * This exception is typically used if the user tries to use a {@link SynchronizedKey}
+     * that isn't registered here in {@link SynchronizedKeyRegistry}.
+     */
+    public static class SynchronizedKeyException extends RuntimeException {
+        public SynchronizedKeyException(String errorMessage) {
+            super(errorMessage);
+        }
+    }
 }
