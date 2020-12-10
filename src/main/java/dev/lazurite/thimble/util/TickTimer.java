@@ -7,16 +7,15 @@ package dev.lazurite.thimble.util;
  * @author Ethan Johnson
  */
 public class TickTimer {
+    private final int count;
     private int ticks;
-    private int count;
 
     /**
      * The constructor for the Tick Timer.
      * @param ticks the number of ticks before {@link TickTimer#tick()} returns true
      */
-    public TickTimer(int ticks) {
-        this.ticks = ticks;
-        this.count = 0;
+    public TickTimer(int count) {
+        this.count = count;
     }
 
     /**
