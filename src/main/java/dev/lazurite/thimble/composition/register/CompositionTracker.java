@@ -22,7 +22,7 @@ public class CompositionTracker {
      * @param composition the {@link Composition}
      */
     public static void attach(Composition composition, Entity entity) {
-        if (CompositionRegistry.get(composition) == -1) {
+        if (CompositionRegistry.get(composition.getIdentifier()) == null) {
             throw new CompositionRegistry.CompositionRegistryException("Unable to attach unregistered composition");
         }
 
@@ -34,7 +34,7 @@ public class CompositionTracker {
      * @param composition the {@link Composition}
      */
     public static void attach(Composition composition, Class<? extends Entity> type) {
-        if (CompositionRegistry.get(composition) == -1) {
+        if (CompositionRegistry.get(composition.getIdentifier()) == null) {
             throw new CompositionRegistry.CompositionRegistryException("Unable to attach unregistered composition");
         }
 

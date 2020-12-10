@@ -26,6 +26,9 @@ import java.util.stream.Stream;
  * @author Ethan Johnson
  */
 public class AttachCompS2C {
+    /**
+     * The packet's {@link Identifier} used for distinguishing it when received on the client.
+     */
     public static final Identifier PACKET_ID = new Identifier(ServerInitializer.MODID, "attach_comp_s2c");
 
     /**
@@ -38,13 +41,13 @@ public class AttachCompS2C {
      */
     public static void accept(PacketContext context, PacketByteBuf buf) {
         World world = context.getPlayer().getEntityWorld();
-        int compID = buf.readInt();
-        int entityID = buf.readInt();
+        Identifier compId = buf.readIdentifier();
+        int entityId = buf.readInt();
 
         /* Attach a new composition on the client */
         context.getTaskQueue().execute(() -> {
-            Composition composition = CompositionRegistry.get(compID);
-            Entity entity = world.getEntityById(entityID);
+            Composition composition = CompositionRegistry.get(compId);
+            Entity entity = world.getEntityById(entityId);
 
             if (entity != null) {
                 if (!CompositionTracker.get(entity).contains(composition)) {
@@ -64,7 +67,7 @@ public class AttachCompS2C {
         PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
 
         /* Composition Registration ID */
-        buf.writeInt(CompositionRegistry.get(composition));
+        buf.writeIdentifier(composition.getIdentifier());
 
         /* Attached Entity ID */
         buf.writeInt(entity.getEntityId());

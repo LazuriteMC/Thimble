@@ -2,6 +2,7 @@ package dev.lazurite.thimble.composition;
 
 import dev.lazurite.thimble.synchronizer.Synchronizer;
 import net.minecraft.entity.Entity;
+import net.minecraft.util.Identifier;
 
 public abstract class Composition {
     private final Synchronizer synchronizer;
@@ -17,6 +18,7 @@ public abstract class Composition {
 
     public abstract void tick(Entity entity);
     public abstract void initSynchronizer();
+    public abstract Identifier getIdentifier();
 
     @Override
     public boolean equals(Object obj) {

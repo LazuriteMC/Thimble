@@ -1,6 +1,8 @@
 package dev.lazurite.thimble.synchronizer;
 
 import com.google.common.collect.Maps;
+import dev.lazurite.thimble.synchronizer.key.SynchronizedKey;
+import net.minecraft.nbt.CompoundTag;
 
 import java.util.Map;
 import java.util.UUID;
@@ -40,6 +42,17 @@ public class Synchronizer {
 
     public Map<UUID, Entry<?>> getAll() {
         return this.entries;
+    }
+
+    public void toTag(CompoundTag tag) {
+//        entries.forEach((uuid, entry) -> {
+//            SynchronizedKey<?> key = entry.getKey();
+//            key.getType().toTag(tag, key.getIdentifier(), entry.getValue());
+//        });
+    }
+
+    public void fromTag(CompoundTag tag) {
+
     }
 
     @Override
