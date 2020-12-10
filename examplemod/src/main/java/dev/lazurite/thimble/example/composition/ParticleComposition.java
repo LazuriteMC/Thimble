@@ -2,54 +2,33 @@ package dev.lazurite.thimble.example.composition;
 
 import dev.lazurite.thimble.composition.Composition;
 import dev.lazurite.thimble.example.ServerInitializer;
-import dev.lazurite.thimble.synchronizer.key.SynchronizedKey;
-import dev.lazurite.thimble.synchronizer.key.SynchronizedKeyRegistry;
-import dev.lazurite.thimble.synchronizer.type.SynchronizedTypeRegistry;
-import dev.lazurite.thimble.util.TickTimer;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.WorldRenderer;
 import net.minecraft.entity.Entity;
+import net.minecraft.particle.DustParticleEffect;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 
-public class FloatAwayComposition extends Composition {
-    public static final SynchronizedKey<Float> RATE = SynchronizedKeyRegistry.register(new Identifier(ServerInitializer.MODID, "rate"), SynchronizedTypeRegistry.FLOAT, 0.05f);
-    public static final Identifier identifier = new Identifier(ServerInitializer.MODID, "float_away");
+public class ParticleComposition extends Composition {
+    public static final Identifier identifier = new Identifier(ServerInitializer.MODID, "particle");
 
-    private final TickTimer timer;
+    public ParticleComposition() {
 
-    public FloatAwayComposition() {
-        timer = new TickTimer(60);
-    }
-
-    public FloatAwayComposition(float rate) {
-        this();
-        getSynchronizer().set(RATE, rate);
     }
 
     @Override
     public void tick(Entity entity) {
         World world = entity.getEntityWorld();
 
-        System.out.println("RATE: " + getSynchronizer().get(RATE));
-
         if (world.isClient()) {
-
-        } else {
-            floatUp(entity, getSynchronizer().get(RATE));
-
-            if (timer.tick()) {
-//                Random random = new Random();
-//                getSynchronizer().set(RATE, (random.nextInt(70)+1) / 100.0f);
-            }
+            WorldRenderer worldRenderer = MinecraftClient.getInstance().worldRenderer;
+            worldRenderer.addParticle(new DustParticleEffect(1.0f, 1.0f, 0.0f, 1.0f), true, entity.getX(), entity.getY(), entity.getZ(), 0, 0, 0);
         }
-    }
-
-    public void floatUp(Entity entity, float rate) {
-        entity.setVelocity(0, rate, 0);
     }
 
     @Override
     public void initSynchronizer() {
-        getSynchronizer().track(RATE);
+
     }
 
     @Override

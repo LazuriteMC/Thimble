@@ -26,6 +26,12 @@ public class CompositionTracker {
             throw new CompositionRegistry.CompositionRegistryException("Unable to attach unregistered composition");
         }
 
+        for (UniqueEntry entry : unique) {
+            if (entry.compositions.contains(composition)) {
+                return;
+            }
+        }
+
         unique.add(new UniqueEntry(composition, entity));
     }
 

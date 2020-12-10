@@ -24,7 +24,7 @@ import java.util.stream.Stream;
  * {@link Composition} attached comes into range of the player.
  * @author Ethan Johnson
  */
-public class AttachCompositionPacket {
+public class AttachCompositionS2C {
     /**
      * The packet's {@link Identifier} used for distinguishing it when received.
      */
@@ -47,7 +47,6 @@ public class AttachCompositionPacket {
         context.getTaskQueue().execute(() -> {
             Entity entity = player.getEntityWorld().getEntityById(entityId);
             Composition composition = CompositionRegistry.get(compId);
-            composition.setStale();
 
             if (entity != null) {
                 if (!CompositionTracker.get(entity).contains(composition)) {
@@ -59,7 +58,7 @@ public class AttachCompositionPacket {
 
     /**
      * This method is called whenever you have a {@link Composition} attached
-     * to a specific {@link Entity} on the server but not the client.
+     * to a specific {@link Entity} on the server but the client may or may not have it.
      * @param composition the {@link Composition} to attach.
      * @param entity the {@link Entity} to which the {@link Composition} will be attached
      */
@@ -73,14 +72,14 @@ public class AttachCompositionPacket {
         buf.writeInt(entity.getEntityId());
 
         /* Send it! */
-        if (entity.getEntityWorld().isClient()) {
-            ClientSidePacketRegistry.INSTANCE.sendToServer(PACKET_ID, buf);
-        } else {
-            Stream<PlayerEntity> watchingPlayers = PlayerStream.watching(entity.getEntityWorld(), new BlockPos(entity.getPos()));
-            watchingPlayers.forEach(player -> ServerSidePacketRegistry.INSTANCE.sendToPlayer(player, PACKET_ID, buf));
-        }
+        Stream<PlayerEntity> watchingPlayers = PlayerStream.watching(entity.getEntityWorld(), new BlockPos(entity.getPos()));
+        watchingPlayers.forEach(player -> ServerSidePacketRegistry.INSTANCE.sendToPlayer(player, PACKET_ID, buf));
+    }
 
-        /* Set the composition to be stale so it doesn't send again */
-        composition.setStale();
+    /**
+     * Registers the packet in on the client.
+     */
+    public static void register() {
+        ClientSidePacketRegistry.INSTANCE.register(PACKET_ID, AttachCompositionS2C::accept);
     }
 }
