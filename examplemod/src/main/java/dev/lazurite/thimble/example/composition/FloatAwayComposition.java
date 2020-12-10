@@ -5,19 +5,25 @@ import dev.lazurite.thimble.example.ServerInitializer;
 import dev.lazurite.thimble.synchronizer.key.SynchronizedKey;
 import dev.lazurite.thimble.synchronizer.key.SynchronizedKeyRegistry;
 import dev.lazurite.thimble.synchronizer.type.SynchronizedTypeRegistry;
+import dev.lazurite.thimble.util.TickTimer;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
+
+import java.util.Random;
 
 public class FloatAwayComposition extends Composition {
     public static final SynchronizedKey<Float> RATE = SynchronizedKeyRegistry.register(new Identifier(ServerInitializer.MODID, "rate"), SynchronizedTypeRegistry.FLOAT, 0.05f);
     public static final Identifier identifier = new Identifier(ServerInitializer.MODID, "float_away");
 
-    public FloatAwayComposition() {
+    private final TickTimer timer;
 
+    public FloatAwayComposition() {
+        timer = new TickTimer(60);
     }
 
     public FloatAwayComposition(float rate) {
+        this();
         getSynchronizer().set(RATE, rate);
     }
 
@@ -25,10 +31,17 @@ public class FloatAwayComposition extends Composition {
     public void tick(Entity entity) {
         World world = entity.getEntityWorld();
 
-        System.out.println("TEST PRINT: " + getSynchronizer().get(RATE));
+        System.out.println("RATE: " + getSynchronizer().get(RATE));
 
-        if (!world.isClient()) {
+        if (world.isClient()) {
+
+        } else {
             floatUp(entity, getSynchronizer().get(RATE));
+
+            if (timer.tick()) {
+//                Random random = new Random();
+//                getSynchronizer().set(RATE, (random.nextInt(70)+1) / 100.0f);
+            }
         }
     }
 

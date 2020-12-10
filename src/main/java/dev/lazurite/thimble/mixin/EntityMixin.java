@@ -1,7 +1,7 @@
 package dev.lazurite.thimble.mixin;
 
 import dev.lazurite.thimble.composition.Composition;
-import dev.lazurite.thimble.composition.packet.AttachCompS2C;
+import dev.lazurite.thimble.composition.packet.AttachComposition;
 import dev.lazurite.thimble.composition.register.CompositionRegistry;
 import dev.lazurite.thimble.composition.register.CompositionTracker;
 import net.minecraft.entity.Entity;
@@ -110,8 +110,8 @@ public class EntityMixin {
          * comes after generic compositions so that they may override them.
          */
         CompositionTracker.get(entity).forEach(entry -> {
-            if (!entity.getEntityWorld().isClient()) {
-                AttachCompS2C.send(entry, entity);
+            if (entry.isFresh()) {
+                AttachComposition.send(entry, entity);
             }
 
             entry.getSynchronizer().tick();
