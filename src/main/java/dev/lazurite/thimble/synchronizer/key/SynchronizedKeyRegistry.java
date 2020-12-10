@@ -14,4 +14,18 @@ public class SynchronizedKeyRegistry {
         entries.add(key);
         return key;
     }
+
+    public static SynchronizedKey<?> get(Identifier identifier) {
+        return get(identifier.toString());
+    }
+
+    public static SynchronizedKey<?> get(String identifier) {
+        for (SynchronizedKey<?> entry : entries) {
+            if (entry.toString().equals(identifier)) {
+                return entry;
+            }
+        }
+
+        return null;
+    }
 }

@@ -40,14 +40,14 @@ public class AttachCompS2C {
      * @param buf the contents of the packet
      */
     public static void accept(PacketContext context, PacketByteBuf buf) {
-        World world = context.getPlayer().getEntityWorld();
+        PlayerEntity player = context.getPlayer();
         Identifier compId = buf.readIdentifier();
         int entityId = buf.readInt();
 
         /* Attach a new composition on the client */
         context.getTaskQueue().execute(() -> {
             Composition composition = CompositionRegistry.get(compId);
-            Entity entity = world.getEntityById(entityId);
+            Entity entity = player.getEntityWorld().getEntityById(entityId);
 
             if (entity != null) {
                 if (!CompositionTracker.get(entity).contains(composition)) {

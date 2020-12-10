@@ -51,6 +51,9 @@ public class EntityMixin {
                 if (composition != null) {
                     /* Attach the newly created composition */
                     CompositionTracker.attach(composition, entity);
+
+                    /* Loads the synchronizer from the tag also */
+                    composition.getSynchronizer().fromTag(tag);
                 }
             }
         }
@@ -75,11 +78,13 @@ public class EntityMixin {
         if (!compositions.isEmpty()) {
             /* Write the number of compositions associated with this entity. */
             tag.putInt("CompositionCount", compositions.size());
-            System.out.println("SIZE: " + compositions.size());
 
-            /* Write each composition in the form of "Composition1, Composition2, Composition3, etc." */
             for (int i = 0; i < compositions.size(); i++) {
+                /* Write each composition in the form of "Composition1, Composition2, Composition3, etc." */
                 tag.putString("Composition" + i, compositions.get(i).getIdentifier().toString());
+
+                /* Write the composition's synchronizer object */
+                compositions.get(i).getSynchronizer().toTag(tag);
             }
         }
     }

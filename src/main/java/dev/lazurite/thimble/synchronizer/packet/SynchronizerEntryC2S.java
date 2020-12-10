@@ -27,7 +27,7 @@ public class SynchronizerEntryC2S {
     public static <T> void send(UUID uuid, Synchronizer.Entry<T> entry) {
         PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
         buf.writeUuid(uuid); // synchronizer uuid
-        buf.writeUuid(entry.getKey().getUuid()); // key uuid
+//        buf.writeUuid(entry.getKey().getUuid()); // key uuid
         entry.getKey().getType().write(buf, entry.getValue()); // value
 //        buf.writeUuid(SynchronizedTypeRegistry.get)
         ClientSidePacketRegistry.INSTANCE.sendToServer(PACKET_ID, buf);

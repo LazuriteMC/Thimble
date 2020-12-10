@@ -13,6 +13,8 @@ import net.minecraft.util.hit.HitResult;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
 
+import java.util.Random;
+
 public class TestItem extends Item {
     public TestItem(Settings settings) {
         super(settings);
@@ -26,10 +28,11 @@ public class TestItem extends Item {
         if (!world.isClient()) {
             if (hitResult.getType() == HitResult.Type.BLOCK) {
                 CowEntity cowEntity = EntityType.COW.create(world);
+                Random random = new Random();
 
                 if (cowEntity != null) {
                     cowEntity.updatePosition(hitResult.getPos().x, hitResult.getPos().y, hitResult.getPos().z);
-                    CompositionTracker.attach(new FloatAwayComposition(0.2f), cowEntity);
+                    CompositionTracker.attach(new FloatAwayComposition((random.nextInt(4)+1) / 10.0f), cowEntity);
                     world.spawnEntity(cowEntity);
                 }
 
