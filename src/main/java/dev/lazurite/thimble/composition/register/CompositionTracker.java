@@ -6,7 +6,14 @@ import net.minecraft.entity.Entity;
 
 import java.util.List;
 
-public class AttachedCompositions {
+/**
+ * Used for tracking active compositions. You can attach
+ * any composition to any entity or entity type using
+ * the {@link CompositionTracker#attach(Composition, Entity)}
+ * or the {@link CompositionTracker#attach(Composition, Class)} methods.
+ * @author Ethan Johnson
+ */
+public class CompositionTracker {
     private static final List<GenericEntry> generic = Lists.newArrayList();
     private static final List<UniqueEntry> unique = Lists.newArrayList();
 

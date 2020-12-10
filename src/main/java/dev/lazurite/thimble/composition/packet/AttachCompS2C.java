@@ -1,7 +1,7 @@
 package dev.lazurite.thimble.composition.packet;
 
 import dev.lazurite.thimble.composition.Composition;
-import dev.lazurite.thimble.composition.register.AttachedCompositions;
+import dev.lazurite.thimble.composition.register.CompositionTracker;
 import dev.lazurite.thimble.composition.register.CompositionRegistry;
 import dev.lazurite.thimble.side.server.ServerInitializer;
 import io.netty.buffer.Unpooled;
@@ -16,7 +16,6 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-import java.util.UUID;
 import java.util.stream.Stream;
 
 public class AttachCompS2C {
@@ -32,8 +31,8 @@ public class AttachCompS2C {
             Composition composition = CompositionRegistry.get(compID);
             Entity entity = world.getEntityById(entityID);
 
-            if (!AttachedCompositions.get(entity).contains(composition)) {
-                AttachedCompositions.attach(composition, entity);
+            if (!CompositionTracker.get(entity).contains(composition)) {
+                CompositionTracker.attach(composition, entity);
             }
         });
     }

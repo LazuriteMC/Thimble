@@ -1,6 +1,6 @@
 package dev.lazurite.thimble.example.item;
 
-import dev.lazurite.thimble.composition.register.AttachedCompositions;
+import dev.lazurite.thimble.composition.register.CompositionTracker;
 import dev.lazurite.thimble.example.composition.FloatAwayComposition;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.passive.CowEntity;
@@ -29,7 +29,7 @@ public class TestItem extends Item {
 
                 if (cowEntity != null) {
                     cowEntity.updatePosition(hitResult.getPos().x, hitResult.getPos().y, hitResult.getPos().z);
-                    AttachedCompositions.attach(new FloatAwayComposition(0.2f), cowEntity);
+                    CompositionTracker.attach(new FloatAwayComposition(0.2f), cowEntity);
                     world.spawnEntity(cowEntity);
                 }
 
