@@ -24,7 +24,7 @@ import java.util.stream.Stream;
  * {@link Composition} attached comes into range of the player.
  * @author Ethan Johnson
  */
-public class AttachComposition {
+public class AttachCompositionPacket {
     /**
      * The packet's {@link Identifier} used for distinguishing it when received.
      */
@@ -65,7 +65,6 @@ public class AttachComposition {
      */
     public static void send(Composition composition, Entity entity) {
         PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
-
 
         /* Composition Registration ID */
         buf.writeIdentifier(composition.getIdentifier());
