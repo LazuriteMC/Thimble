@@ -10,8 +10,8 @@
   ],
 
   "contact": {
-    "homepage": "https://lazurite.dev",
-    "sources": "https://github.com/lazuritemc/thimble"
+    "website": "https://lazurite.dev",
+    "repo": "https://github.com/lazuritemc/thimble"
   },
 
   "license": "MIT",

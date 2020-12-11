@@ -4,14 +4,14 @@
   "version": "${version}",
 
   "name": "Thimble",
-  "description": "An improved data tracker system for Minecraft.",
+  "description": "An improved entity behavior and data tracker system for Minecraft.",
   "authors": [
     "Lazurite Team"
   ],
 
   "contact": {
     "website": "https://lazurite.dev",
-    "sources": "https://github.com/lazuritemc/thimble"
+    "repo": "https://github.com/lazuritemc/thimble"
   },
 
   "license": "MIT",
