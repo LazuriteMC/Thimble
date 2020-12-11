@@ -41,7 +41,6 @@ public class CompositionTracker {
         /* Check if it's a duplicate */
         for (Composition comp : unique.get(entity)) {
             if (comp.equals(composition)) {
-                System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
                 return;
             }
         }
