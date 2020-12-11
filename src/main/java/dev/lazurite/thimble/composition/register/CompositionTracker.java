@@ -1,10 +1,12 @@
 package dev.lazurite.thimble.composition.register;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import dev.lazurite.thimble.composition.Composition;
 import net.minecraft.entity.Entity;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Used for tracking active compositions. You can attach
@@ -14,25 +16,33 @@ import java.util.List;
  * @author Ethan Johnson
  */
 public class CompositionTracker {
-    private static final List<GenericEntry> generic = Lists.newArrayList();
-    private static final List<UniqueEntry> unique = Lists.newArrayList();
+    /**
+     * Map of all generic {@link Composition} objects.
+     */
+    private static final Map<Class<? extends Entity>, Composition> generic = Maps.newHashMap();
+
+    /**
+     * Map of all unique {@link Composition} objects.
+     */
+    private static final Map<Entity, Composition> unique = Maps.newHashMap();
 
     /**
      * Attaches a unique {@link Composition} to the given {@link Entity} object.
      * @param composition the {@link Composition}
      */
     public static void attach(Composition composition, Entity entity) {
+        /* Throw an error if the composition isn't registered */
         if (CompositionRegistry.get(composition.getIdentifier()) == null) {
             throw new CompositionRegistry.CompositionRegistryException("Unable to attach unregistered composition");
         }
 
-        for (UniqueEntry entry : unique) {
-            if (entry.compositions.contains(composition)) {
-                return;
-            }
+        /* Check if it's a duplicate */
+        if (unique.containsValue(composition) && unique.containsKey(entity)) {
+            return;
         }
 
-        unique.add(new UniqueEntry(composition, entity));
+        /* Add it to the map */
+        unique.put(entity, composition);
     }
 
     /**
@@ -40,11 +50,18 @@ public class CompositionTracker {
      * @param composition the {@link Composition}
      */
     public static void attach(Composition composition, Class<? extends Entity> type) {
+        /* Throw an error if the composition isn't registered */
         if (CompositionRegistry.get(composition.getIdentifier()) == null) {
             throw new CompositionRegistry.CompositionRegistryException("Unable to attach unregistered composition");
         }
 
-        generic.add(new GenericEntry(composition, type));
+        /* Check if it's a duplicate */
+        if (generic.containsValue(composition) && generic.containsKey(type)) {
+            return;
+        }
+
+        /* Add it to the map */
+        generic.put(type, composition);
     }
 
     /**
@@ -57,9 +74,9 @@ public class CompositionTracker {
     public static List<Composition> get(Entity entity) {
         List<Composition> out = Lists.newArrayList();
 
-        for (UniqueEntry entry : unique) {
-            if (entry.getEntity().equals(entity)) {
-                out.addAll(entry.getCompositions());
+        for (Map.Entry<Entity, Composition> entry : unique.entrySet()) {
+            if (entry.getKey().equals(entity)) {
+                out.add(entry.getValue());
             }
         }
 
@@ -74,48 +91,12 @@ public class CompositionTracker {
     public static List<Composition> get(Class<? extends Entity> type) {
         List<Composition> out = Lists.newArrayList();
 
-        for (GenericEntry entry : generic) {
-            if (entry.getType().equals(type)) {
-                out.addAll(entry.getCompositions());
+        for (Map.Entry<Class<? extends Entity>, Composition> entry : generic.entrySet()) {
+            if (entry.getKey().equals(type)) {
+                out.add(entry.getValue());
             }
         }
 
         return out;
-    }
-
-    static class GenericEntry {
-        private final List<Composition> compositions = Lists.newArrayList();
-        private final Class<? extends Entity> type;
-
-        public GenericEntry(Composition composition, Class<? extends Entity> type) {
-            this.compositions.add(composition);
-            this.type = type;
-        }
-
-        public List<Composition> getCompositions() {
-            return this.compositions;
-        }
-
-        public Class<? extends Entity> getType() {
-            return this.type;
-        }
-    }
-
-    static class UniqueEntry {
-        private final List<Composition> compositions = Lists.newArrayList();
-        private final Entity entity;
-
-        public UniqueEntry(Composition composition, Entity entity) {
-            this.compositions.add(composition);
-            this.entity = entity;
-        }
-
-        public List<Composition> getCompositions() {
-            return this.compositions;
-        }
-
-        public Entity getEntity() {
-            return this.entity;
-        }
     }
 }

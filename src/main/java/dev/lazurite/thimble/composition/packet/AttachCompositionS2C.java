@@ -45,12 +45,14 @@ public class AttachCompositionS2C {
 
         /* Attach a new composition on the client */
         context.getTaskQueue().execute(() -> {
-            Entity entity = player.getEntityWorld().getEntityById(entityId);
-            Composition composition = CompositionRegistry.get(compId);
+            if (player.getEntityWorld() != null) {
+                Entity entity = player.getEntityWorld().getEntityById(entityId);
+                Composition composition = CompositionRegistry.get(compId);
 
-            if (entity != null) {
-                if (!CompositionTracker.get(entity).contains(composition)) {
-                    CompositionTracker.attach(composition, entity);
+                if (entity != null) {
+                    if (!CompositionTracker.get(entity).contains(composition)) {
+                        CompositionTracker.attach(composition, entity);
+                    }
                 }
             }
         });

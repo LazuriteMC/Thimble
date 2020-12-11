@@ -2,7 +2,7 @@ package dev.lazurite.thimble.example;
 
 import dev.lazurite.thimble.composition.register.CompositionRegistry;
 import dev.lazurite.thimble.example.composition.FloatAwayComposition;
-import dev.lazurite.thimble.example.composition.ParticleComposition;
+import dev.lazurite.thimble.example.composition.SmokeComposition;
 import dev.lazurite.thimble.example.item.WandItem;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.item.Item;
@@ -17,7 +17,7 @@ public class ServerInitializer implements ModInitializer {
 
     static {
         CompositionRegistry.register(FloatAwayComposition::new);
-        CompositionRegistry.register(ParticleComposition::new);
+        CompositionRegistry.register(SmokeComposition::new);
     }
 
     @Override
