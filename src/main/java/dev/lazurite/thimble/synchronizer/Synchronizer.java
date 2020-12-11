@@ -18,13 +18,6 @@ public class Synchronizer {
     private final List<Entry<?>> entries = Lists.newArrayList();
 
     /**
-     * Much wow.
-     */
-    public Synchronizer() {
-
-    }
-
-    /**
      * Checks for dirty entries.
      */
     public void tick() {
@@ -63,6 +56,10 @@ public class Synchronizer {
         for (Entry<?> entry : entries) {
             if (entry.getKey().equals(key)) {
                 ((Entry<T>) entry).setValue(value);
+
+                if (entry.getKey().getConsumer() != null) {
+//                    ((Entry<T>) entry).getKey().getConsumer().accept(((Entry<T>) entry).getValue(), value);
+                }
             }
         }
     }

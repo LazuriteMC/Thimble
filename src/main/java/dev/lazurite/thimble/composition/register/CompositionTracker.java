@@ -19,30 +19,35 @@ public class CompositionTracker {
     /**
      * Map of all generic {@link Composition} objects.
      */
-    private static final Map<Class<? extends Entity>, Composition> generic = Maps.newHashMap();
+    private static final Map<Class<? extends Entity>, List<Composition>> generic = Maps.newConcurrentMap();
 
     /**
      * Map of all unique {@link Composition} objects.
      */
-    private static final Map<Entity, Composition> unique = Maps.newHashMap();
+    private static final Map<Entity, List<Composition>> unique = Maps.newConcurrentMap();
 
     /**
      * Attaches a unique {@link Composition} to the given {@link Entity} object.
      * @param composition the {@link Composition}
      */
     public static void attach(Composition composition, Entity entity) {
+        unique.computeIfAbsent(entity, e -> Lists.newArrayList());
+
         /* Throw an error if the composition isn't registered */
         if (CompositionRegistry.get(composition.getIdentifier()) == null) {
             throw new CompositionRegistry.CompositionRegistryException("Unable to attach unregistered composition");
         }
 
         /* Check if it's a duplicate */
-        if (unique.containsValue(composition) && unique.containsKey(entity)) {
-            return;
+        for (Composition comp : unique.get(entity)) {
+            if (comp.equals(composition)) {
+                System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+                return;
+            }
         }
 
         /* Add it to the map */
-        unique.put(entity, composition);
+        unique.get(entity).add(composition);
     }
 
     /**
@@ -50,18 +55,22 @@ public class CompositionTracker {
      * @param composition the {@link Composition}
      */
     public static void attach(Composition composition, Class<? extends Entity> type) {
+        generic.computeIfAbsent(type, t -> Lists.newArrayList());
+
         /* Throw an error if the composition isn't registered */
         if (CompositionRegistry.get(composition.getIdentifier()) == null) {
             throw new CompositionRegistry.CompositionRegistryException("Unable to attach unregistered composition");
         }
 
         /* Check if it's a duplicate */
-        if (generic.containsValue(composition) && generic.containsKey(type)) {
-            return;
+        for (Composition comp : generic.get(type)) {
+            if (comp.equals(composition)) {
+                return;
+            }
         }
 
         /* Add it to the map */
-        generic.put(type, composition);
+        generic.get(type).add(composition);
     }
 
     /**
@@ -74,10 +83,8 @@ public class CompositionTracker {
     public static List<Composition> get(Entity entity) {
         List<Composition> out = Lists.newArrayList();
 
-        for (Map.Entry<Entity, Composition> entry : unique.entrySet()) {
-            if (entry.getKey().equals(entity)) {
-                out.add(entry.getValue());
-            }
+        if (unique.containsKey(entity)) {
+            out.addAll(unique.get(entity));
         }
 
         return out;
@@ -91,10 +98,8 @@ public class CompositionTracker {
     public static List<Composition> get(Class<? extends Entity> type) {
         List<Composition> out = Lists.newArrayList();
 
-        for (Map.Entry<Class<? extends Entity>, Composition> entry : generic.entrySet()) {
-            if (entry.getKey().equals(type)) {
-                out.add(entry.getValue());
-            }
+        if (generic.containsKey(type)) {
+            out.addAll(generic.get(type));
         }
 
         return out;

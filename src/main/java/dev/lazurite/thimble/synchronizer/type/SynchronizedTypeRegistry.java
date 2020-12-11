@@ -1,12 +1,30 @@
 package dev.lazurite.thimble.synchronizer.type;
 
 import com.google.common.collect.Maps;
+import net.fabricmc.api.ModInitializer;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.PacketByteBuf;
 
 import java.util.Map;
 import java.util.UUID;
 
+/**
+ * This is the registry for {@link SynchronizedType} objects. It's
+ * basically just a list of {@link SynchronizedType} objects you have
+ * available to you. If you would like to use a type not listed here, you
+ * can write your own by implementing the {@link SynchronizedType} interface.
+ * If you write your own, don't forget to register it here by calling
+ * {@link SynchronizedTypeRegistry#register} in a static context, not somewhere
+ * like {@link ModInitializer#onInitialize()}.
+ *
+ * DEFAULT TYPES:
+ *    * Boolean
+ *    * Float
+ *    * Integer
+ *    * UUID
+ *
+ * @author Ethan Johnson
+ */
 public class SynchronizedTypeRegistry {
     private static final Map<UUID, SynchronizedType<?>> entries = Maps.newHashMap();
 
@@ -138,19 +156,18 @@ public class SynchronizedTypeRegistry {
         }
     };
 
+    /**
+     * Register the type in the list of entries.
+     * @param synchronizedType the type to be registered
+     * @param <T> the type of the {@link SynchronizedType} object
+     */
     public static <T> void register(SynchronizedType<T> synchronizedType) {
         entries.put(java.util.UUID.randomUUID(), synchronizedType);
     }
 
-    public static SynchronizedType<?> get(UUID uuid) {
-        return entries.get(uuid);
-    }
-
-    public static <T> UUID get(SynchronizedType<T> synchronizedType) {
-        return null;
-//        return entries.values().;
-    }
-
+    /*
+     * This is where the default types are registered.
+     */
     static {
         register(BOOLEAN);
         register(INTEGER);

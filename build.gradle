@@ -4,6 +4,10 @@ plugins {
 }
 
 subprojects {
+	repositories {
+		maven { url 'https://jitpack.io' }
+	}
+
 	apply plugin: 'fabric-loom'
 	archivesBaseName = rootProject.archives_base_name + "-" + project.name
 	group = rootProject.maven_group + "." + rootProject.archives_base_name
@@ -12,6 +16,7 @@ subprojects {
 		compile rootProject.sourceSets.main.output
 		modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 		modImplementation "io.github.prospector:modmenu:${project.modmenu_version}"
+		modImplementation 'com.github.joaoh1:OkZoomer:4.0.0-alpha.4.1.16.1'
 	}
 }
 

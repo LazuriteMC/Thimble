@@ -23,7 +23,7 @@ public abstract class Composition {
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof Composition) {
-            return ((Composition) obj).getClass().equals(getClass());
+            return ((Composition) obj).getIdentifier().equals(getIdentifier());
         }
 
         return false;
