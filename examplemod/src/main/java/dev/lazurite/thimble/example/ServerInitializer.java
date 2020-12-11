@@ -10,16 +10,31 @@ import net.minecraft.item.ItemGroup;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 
+/**
+ * The entry-point for this example mod. This is where you will likely
+ * want to register your {@link dev.lazurite.thimble.composition.Composition}
+ * objects. This is also where we register the {@link WandItem}.
+ */
 public class ServerInitializer implements ModInitializer {
     public static final String MODID = "examplemod";
 
+    /**
+     * Our test item for testing the example {@link dev.lazurite.thimble.composition.Composition} objects.
+     */
     public static WandItem WAND_ITEM;
 
+    /*
+     * Register each composition. Make sure to do this statically
+     * and not inside of a method like onInitialize().
+     */
     static {
         CompositionRegistry.register(FloatAwayComposition::new);
         CompositionRegistry.register(SmokeComposition::new);
     }
 
+    /**
+     * Registers the {@link WandItem}.
+     */
     @Override
     public void onInitialize() {
         WAND_ITEM = Registry.register(
