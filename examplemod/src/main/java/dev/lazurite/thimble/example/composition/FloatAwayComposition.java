@@ -44,7 +44,7 @@ public class FloatAwayComposition extends Composition {
     /**
      * The main spot where you'll define your custom behavior. All this
      * does is set the upwards velocity of the {@link Entity} to the rate.
-     * @param entity the {@link Entity} with this {@link Composition} attached.
+     * @param entity the {@link Entity} with this {@link Composition} attached
      */
     @Override
     public void tick(Entity entity) {
