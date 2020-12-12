@@ -2,8 +2,11 @@ package dev.lazurite.thimble.mixin;
 
 import dev.lazurite.thimble.Thimble;
 import dev.lazurite.thimble.composition.Composition;
+import dev.lazurite.thimble.composition.CompositionFactory;
 import dev.lazurite.thimble.composition.packet.StitchCompositionS2C;
+import dev.lazurite.thimble.synchronizer.Synchronizer;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.ActionResult;
@@ -48,14 +51,20 @@ public class EntityMixin {
 
         /* Loop through to retrieve each Composition from the tag */
         for (int i = 0; i < compositionNumber; i++) {
-            Identifier identifier = new Identifier(tag.getString("c" + i));
-            Composition composition = Thimble.getRegistered(identifier).create();
+            /* Retrieve the "inner" tag */
+            CompoundTag innerTag = tag.getCompound("c" + i);
 
-            /* Attach the newly created composition */
-            Thimble.stitch(composition, entity);
+            /* Get the composition factory */
+            CompositionFactory factory = Thimble.getRegistered(new Identifier(tag.getString("compositionId")));
 
-            /* Loads the synchronizer from the tag also */
-            composition.getSynchronizer().fromTag(tag);
+            /* Make a blank synchronizer */
+            Synchronizer synchronizer = new Synchronizer(Synchronizer.NULL_UUID);
+
+            /* Stitch the composition */
+            Thimble.stitch(factory, entity, synchronizer);
+
+            /* Read the synchronizer from the "inner" tag */
+            synchronizer.fromTag(innerTag);
         }
     }
 
@@ -81,11 +90,23 @@ public class EntityMixin {
             tag.putInt("cc", compositions.size());
 
             for (int i = 0; i < compositions.size(); i++) {
-                /* Write each composition in the form of "c1, c2, c3, etc." */
-                tag.putString("c" + i, compositions.get(i).getIdentifier().toString());
+                /* The composition for this loop iteration */
+                Composition composition = compositions.get(i);
 
-                /* Write the composition's synchronizer object */
-                compositions.get(i).getSynchronizer().toTag(tag);
+                /* The synchronizer belonging to the current composition */
+                Synchronizer synchronizer = composition.getSynchronizer();
+
+                /* A new "inner" tag to write to */
+                CompoundTag innerTag = new CompoundTag();
+
+                /* Add the new "inner" tag */
+                tag.put("c" + i, innerTag);
+
+                /* Write the composition's identifier to the "inner" tag */
+                innerTag.putString("compositionId", composition.getIdentifier().toString());
+
+                /* Write the synchronizer to the "inner" tag */
+                composition.getSynchronizer().toTag(innerTag);
             }
         }
     }
@@ -129,6 +150,23 @@ public class EntityMixin {
 
         /* Gets all unique stitches associated with this entity */
         Thimble.getStitches(entity).forEach(entry -> entry.interact(player, hand));
+    }
+
+    /**
+     * This injection provides a way for {@link Composition}
+     * objects to detect when their stitched {@link Entity}
+     * takes damage
+     * @param source the source of damage
+     * @param amount the amount of damage taken
+     * @param info required by every mixin injection
+     */
+    @Inject(method = "damage", at = @At("TAIL"))
+    public void damage(DamageSource source, float amount, CallbackInfoReturnable<Boolean> info) {
+        /* Gets all generic stitches associated with this entity */
+        Thimble.getStitches(entity.getClass()).forEach(entry -> entry.damage(source, amount));
+
+        /* Gets all unique stitches associated with this entity */
+        Thimble.getStitches(entity).forEach(entry -> entry.damage(source, amount));
     }
 
     /**

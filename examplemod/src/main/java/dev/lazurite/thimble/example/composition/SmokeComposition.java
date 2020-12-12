@@ -2,11 +2,12 @@ package dev.lazurite.thimble.example.composition;
 
 import dev.lazurite.thimble.composition.Composition;
 import dev.lazurite.thimble.example.ServerInitializer;
+import dev.lazurite.thimble.synchronizer.Synchronizer;
 import dev.lazurite.thimble.synchronizer.key.SynchronizedKey;
-import dev.lazurite.thimble.synchronizer.key.SynchronizedKeyRegistry;
 import dev.lazurite.thimble.synchronizer.type.SynchronizedTypeRegistry;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.util.Hand;
@@ -28,13 +29,13 @@ public class SmokeComposition extends Composition {
      * A synchronized value, representing whether or
      * not the {@link Entity} should emit smoke.
      */
-    public static final SynchronizedKey<Boolean> SHOULD_SMOKE = SynchronizedKeyRegistry.register(new Identifier(ServerInitializer.MODID, "should_smoke"), SynchronizedTypeRegistry.BOOLEAN, true);
+    public static final SynchronizedKey<Boolean> SHOULD_SMOKE = Synchronizer.register(new Identifier(ServerInitializer.MODID, "should_smoke"), SynchronizedTypeRegistry.BOOLEAN, true);
 
     /**
      * Default constructor, necessary in order to register the {@link Composition}.
      */
-    public SmokeComposition() {
-
+    public SmokeComposition(Synchronizer synchronizer) {
+        super(synchronizer);
     }
 
     /**
@@ -61,6 +62,16 @@ public class SmokeComposition extends Composition {
     @Override
     public void interact(PlayerEntity player, Hand hand) {
         getSynchronizer().set(SHOULD_SMOKE, false);
+    }
+
+    /**
+     * Sets the {@link Entity} to smoke.
+     * @param source the source of damage
+     * @param amount the amount of damage taken
+     */
+    @Override
+    public void damage(DamageSource source, float amount) {
+        getSynchronizer().set(SHOULD_SMOKE, true);
     }
 
     /**

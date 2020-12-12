@@ -2,6 +2,7 @@ package dev.lazurite.thimble.composition;
 
 import dev.lazurite.thimble.synchronizer.Synchronizer;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
@@ -22,8 +23,8 @@ public abstract class Composition {
      * The default constructor. It creates and initializes
      * the {@link Synchronizer} object.
      */
-    public Composition() {
-        this.synchronizer = new Synchronizer();
+    public Composition(Synchronizer synchronizer) {
+        this.synchronizer = synchronizer;
         this.initSynchronizer();
     }
 
@@ -35,7 +36,6 @@ public abstract class Composition {
      */
     public abstract void tick(Entity entity);
 
-
     /**
      * Called whenever a {@link PlayerEntity} interacts with the
      * {@link Entity} that this {@link Composition} is stitched into.
@@ -43,6 +43,14 @@ public abstract class Composition {
      * @param hand the {@link Hand} of the {@link PlayerEntity}
      */
     public abstract void interact(PlayerEntity player, Hand hand);
+
+    /**
+     * Called whenever the stitched {@link Entity} is
+     * damaged in some way.
+     * @param source the source of damage
+     * @param amount the amount of damage taken
+     */
+    public abstract void damage(DamageSource source, float amount);
 
     /**
      * Called whenever the {@link Entity} is removed

@@ -4,6 +4,7 @@ import dev.lazurite.thimble.Thimble;
 import dev.lazurite.thimble.composition.Composition;
 import dev.lazurite.thimble.composition.CompositionFactory;
 import dev.lazurite.thimble.side.server.ServerInitializer;
+import dev.lazurite.thimble.synchronizer.Synchronizer;
 import io.netty.buffer.Unpooled;
 import net.fabricmc.fabric.api.network.ClientSidePacketRegistry;
 import net.fabricmc.fabric.api.network.PacketContext;
@@ -15,6 +16,7 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 
+import java.util.UUID;
 import java.util.stream.Stream;
 
 /**
@@ -41,6 +43,7 @@ public class StitchCompositionS2C {
     public static void accept(PacketContext context, PacketByteBuf buf) {
         PlayerEntity player = context.getPlayer();
         Identifier compId = buf.readIdentifier();
+        UUID synchronizerId = buf.readUuid();
         int entityId = buf.readInt();
 
         /* Stitch a new composition on the client */
@@ -52,7 +55,7 @@ public class StitchCompositionS2C {
                 if (entity != null && composition != null) {
                     for (Composition entry : Thimble.getStitches(entity)) {
                         if (entry.getIdentifier().equals(compId)) {
-                            Thimble.stitch(composition, entity);
+                            Thimble.stitch(composition, entity, new Synchronizer(synchronizerId));
                         }
                     }
                 }
@@ -72,18 +75,14 @@ public class StitchCompositionS2C {
         /* Composition Registration ID */
         buf.writeIdentifier(composition.getIdentifier());
 
+        /* Synchronizer ID */
+        buf.writeUuid(composition.getSynchronizer().getUuid());
+
         /* Stitched Entity ID */
         buf.writeInt(entity.getEntityId());
 
         /* Send it! */
         Stream<PlayerEntity> watchingPlayers = PlayerStream.watching(entity.getEntityWorld(), new BlockPos(entity.getPos()));
         watchingPlayers.forEach(player -> ServerSidePacketRegistry.INSTANCE.sendToPlayer(player, PACKET_ID, buf));
-    }
-
-    /**
-     * Registers the packet in on the client.
-     */
-    public static void register() {
-        ClientSidePacketRegistry.INSTANCE.register(PACKET_ID, StitchCompositionS2C::accept);
     }
 }

@@ -1,14 +1,18 @@
 package dev.lazurite.thimble.synchronizer;
 
 import com.google.common.collect.Lists;
+import dev.lazurite.thimble.exception.SynchronizedKeyException;
 import dev.lazurite.thimble.synchronizer.key.SynchronizedKey;
-import dev.lazurite.thimble.synchronizer.key.SynchronizedKeyRegistry;
-import dev.lazurite.thimble.synchronizer.packet.SynchronizeEntryS2C;
+import dev.lazurite.thimble.synchronizer.packet.SynchronizeEntryPacket;
+import dev.lazurite.thimble.synchronizer.type.SynchronizedType;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.PacketByteBuf;
+import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * This is the main class used to sync information across the client
@@ -17,17 +21,35 @@ import java.util.List;
  * @author Ethan Johnson
  */
 public class Synchronizer {
+    /** An empty/null {@link UUID} object. */
+    public static final UUID NULL_UUID = new UUID(0, 0);
+
+    /** The list of registered keys. */
+    private static final List<SynchronizedKey<?>> keyRegistry = Lists.newArrayList();
+
+    /** The list of synchronized entries. */
     private final List<Entry<?>> entries = Lists.newArrayList();
 
-    public Synchronizer() {
+    /** The {@link UUID} used for identifying this {@link Synchronizer}. */
+    private UUID uuid;
 
+    /**
+     * The constructor which takes a {@link UUID}
+     * object which is used to identify the {@link Synchronizer}.
+     * @param uuid the {@link UUID} used for identification
+     */
+    public Synchronizer(UUID uuid) {
+        this.uuid = uuid;
     }
 
+    /**
+     * Sends a packet if an entry becomes dirty.
+     * @param world the {@link World}, may be client or server side
+     */
     public void tick(World world) {
         this.entries.forEach(entry -> {
             if (entry.dirty) {
-                SynchronizeEntryS2C.send(this, entry, world);
-                // send packet
+                SynchronizeEntryPacket.send(this, entry, world);
             }
         });
     }
@@ -39,8 +61,8 @@ public class Synchronizer {
      * @param <T> the type of the {@link SynchronizedKey}
      */
     public <T> void track(SynchronizedKey<T> key) {
-        if (SynchronizedKeyRegistry.get(key.getIdentifier()) == null) {
-            throw new SynchronizedKeyRegistry.SynchronizedKeyException("Unable to use unregistered key");
+        if (get(key.getIdentifier()) == null) {
+            throw new SynchronizedKeyException("Unable to use unregistered key");
         }
 
         entries.add(new Entry<>(key, key.getFallback()));
@@ -55,17 +77,31 @@ public class Synchronizer {
      */
     @SuppressWarnings("unchecked")
     public <T> void set(SynchronizedKey<T> key, T value) {
+        /* Null values are not allowed */
         if (value == null) return;
 
         for (Entry<?> entry : entries) {
             if (entry.getKey().equals(key)) {
+                /* Set the value in the list of entries */
                 ((Entry<T>) entry).setValue(value);
 
-                if (entry.getKey().getConsumer() != null) {
-//                    ((Entry<T>) entry).getKey().getConsumer().accept(((Entry<T>) entry).getValue(), value);
+                /* Execute the consumer if it exists */
+                if (key.getConsumer() != null) {
+                    key.getConsumer().accept(value);
                 }
             }
         }
+    }
+
+    /**
+     * Sets the value of the given {@link SynchronizedKey}
+     * to the value stored in the {@link PacketByteBuf}.
+     * @param key the {@link SynchronizedKey}} to change
+     * @param buf the {@link PacketByteBuf} containing the value to change
+     * @param <T> the type of the key/value
+     */
+    public <T> void set(SynchronizedKey<T> key, PacketByteBuf buf) {
+        set(key, key.getType().read(buf));
     }
 
     /**
@@ -94,10 +130,18 @@ public class Synchronizer {
     }
 
     /**
+     * @return the {@link UUID} used to identify this {@link Synchronizer}
+     */
+    public UUID getUuid() {
+        return this.uuid;
+    }
+
+    /**
      * Convert this entire {@link SynchronizedKey} into a {@link CompoundTag}.
      * @param tag the {@link CompoundTag} to write to
      */
     public void toTag(CompoundTag tag) {
+        tag.putUuid("synchronizerId", getUuid());
         entries.forEach(entry -> entry.toTag(tag));
     }
 
@@ -106,6 +150,7 @@ public class Synchronizer {
      * @param tag the {@link CompoundTag} to read from
      */
     public void fromTag(CompoundTag tag) {
+        this.uuid = tag.getUuid("synchronizerId");
         entries.forEach(entry -> entry.fromTag(tag));
     }
 
@@ -116,6 +161,35 @@ public class Synchronizer {
         }
 
         return false;
+    }
+
+    /**
+     * Registers a new {@link SynchronizedKey}.
+     * @param identifier the key's {@link Identifier}
+     * @param type the key's data type
+     * @param fallback the key's fallback value
+     * @param <T> the key and the value's generic type
+     * @return the new {@link SynchronizedKey}
+     */
+    public static <T> SynchronizedKey<T> register(Identifier identifier, SynchronizedType<T> type, T fallback) {
+        SynchronizedKey<T> key = new SynchronizedKey<>(identifier, type, fallback);
+        keyRegistry.add(key);
+        return key;
+    }
+
+    /**
+     * Gets a registered key with the given {@link Identifier}.
+     * @param identifier the {@link Identifier} used for finding the key
+     * @return the registered {@link SynchronizedKey}
+     */
+    private static SynchronizedKey<?> get(Identifier identifier) {
+        for (SynchronizedKey<?> key : keyRegistry) {
+            if (key.getIdentifier().equals(identifier)) {
+                return key;
+            }
+        }
+
+        return null;
     }
 
     /**

@@ -1,4 +1,4 @@
-package dev.lazurite.thimble.composition.exception;
+package dev.lazurite.thimble.exception;
 
 import dev.lazurite.thimble.composition.Composition;
 

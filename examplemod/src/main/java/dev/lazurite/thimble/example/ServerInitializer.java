@@ -1,7 +1,6 @@
 package dev.lazurite.thimble.example;
 
-import dev.lazurite.thimble.composition.CompositionRegistry;
-import dev.lazurite.thimble.composition.tracker.CompositionTracker;
+import dev.lazurite.thimble.Thimble;
 import dev.lazurite.thimble.example.composition.FloatAwayComposition;
 import dev.lazurite.thimble.example.composition.SmokeComposition;
 import dev.lazurite.thimble.example.item.WandItem;
@@ -30,10 +29,10 @@ public class ServerInitializer implements ModInitializer {
      * and not inside of a method like onInitialize().
      */
     static {
-        CompositionRegistry.register(FloatAwayComposition::new);
-        CompositionRegistry.register(SmokeComposition::new);
+        Thimble.register(FloatAwayComposition::new);
+        Thimble.register(SmokeComposition::new);
 
-        CompositionTracker.attach(SmokeComposition::new, CowEntity.class);
+        Thimble.stitch(SmokeComposition::new, CowEntity.class);
     }
 
     /**

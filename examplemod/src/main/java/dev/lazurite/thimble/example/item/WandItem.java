@@ -1,5 +1,8 @@
 package dev.lazurite.thimble.example.item;
 
+import dev.lazurite.thimble.Thimble;
+import dev.lazurite.thimble.example.composition.FloatAwayComposition;
+import dev.lazurite.thimble.example.composition.SmokeComposition;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
@@ -53,11 +56,8 @@ public class WandItem extends Item {
                 /* Get a list of all entities in a 32 block radius */
                 List<Entity> list = world.getOtherEntities(user, new Box(new BlockPos(hitResult.getPos())).expand(16));
 
-                /* Attach a couple of compositions to those entities */
-                list.forEach(entity -> {
-//                    CompositionTracker.attach(FloatAwayComposition::new, entity);
-//                    CompositionTracker.attach(new SmokeComposition(), entity);
-                });
+                /* Stitch a FloatAwayComposition to these entities */
+                list.forEach(entity -> Thimble.stitch(FloatAwayComposition::new, entity));
 
                 return TypedActionResult.success(itemStack);
             }

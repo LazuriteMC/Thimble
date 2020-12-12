@@ -2,10 +2,11 @@ package dev.lazurite.thimble.example.composition;
 
 import dev.lazurite.thimble.composition.Composition;
 import dev.lazurite.thimble.example.ServerInitializer;
+import dev.lazurite.thimble.synchronizer.Synchronizer;
 import dev.lazurite.thimble.synchronizer.key.SynchronizedKey;
-import dev.lazurite.thimble.synchronizer.key.SynchronizedKeyRegistry;
 import dev.lazurite.thimble.synchronizer.type.SynchronizedTypeRegistry;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
@@ -26,13 +27,13 @@ public class FloatAwayComposition extends Composition {
      * A synchronized value, representing the rate at which an associated
      * {@link Entity} would float upwards.
      */
-    public static final SynchronizedKey<Float> RATE = SynchronizedKeyRegistry.register(new Identifier(ServerInitializer.MODID, "rate"), SynchronizedTypeRegistry.FLOAT, 0.05f);
+    public static final SynchronizedKey<Float> RATE = Synchronizer.register(new Identifier(ServerInitializer.MODID, "rate"), SynchronizedTypeRegistry.FLOAT, 0.05f);
 
     /**
      * Default constructor, necessary in order to register the {@link Composition}.
      */
-    public FloatAwayComposition() {
-
+    public FloatAwayComposition(Synchronizer synchronizer) {
+        super(synchronizer);
     }
 
     /**
@@ -58,6 +59,16 @@ public class FloatAwayComposition extends Composition {
     @Override
     public void interact(PlayerEntity player, Hand hand) {
         getSynchronizer().set(RATE, 0.0f);
+    }
+
+    /**
+     * Sets the {@link Entity} speed to 0.3f.
+     * @param source the source of damage
+     * @param amount the amount of damage taken
+     */
+    @Override
+    public void damage(DamageSource source, float amount) {
+        getSynchronizer().set(RATE, 0.3f);
     }
 
     /**

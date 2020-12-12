@@ -4,12 +4,14 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import dev.lazurite.thimble.composition.Composition;
 import dev.lazurite.thimble.composition.CompositionFactory;
-import dev.lazurite.thimble.composition.exception.CompositionRegistryException;
+import dev.lazurite.thimble.exception.CompositionRegistryException;
+import dev.lazurite.thimble.synchronizer.Synchronizer;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.Identifier;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * This is the main class that should be used by mod authors.
@@ -37,7 +39,7 @@ public class Thimble {
      * @param factory the {@link CompositionFactory} used to create a new {@link Composition} object
      */
     public static void register(CompositionFactory factory) {
-        registry.put(factory.create().getIdentifier(), factory);
+        registry.put(factory.create(new Synchronizer(Synchronizer.NULL_UUID)).getIdentifier(), factory);
     }
 
     /**
@@ -49,15 +51,25 @@ public class Thimble {
         return registry.get(identifier);
     }
 
-    public static void stitch(CompositionFactory factory, Class<? extends Entity> entity) {
-        stitch(factory.create(), entity);
+    /**
+     * Stiches a generic {@link Composition} to a {@link Class} of type {@link Entity}.
+     * @param factory the {@link CompositionFactory} to generate the {@link Composition}
+     * @param type the type of {@link Entity}
+     */
+    public static void stitch(CompositionFactory factory, Class<? extends Entity> type) {
+        stitch(factory, type, new Synchronizer(UUID.randomUUID()));
     }
 
     /**
      * Stitches a generic {@link Composition} to a {@link Class} of type {@link Entity}.
-     * @param composition the {@link Composition}
+     * @param factory the {@link CompositionFactory} to generate the {@link Composition}
+     * @param type the type of {@link Entity}
+     * @param synchronizer the {@link Synchronizer} that the {@link Composition} will use
      */
-    public static void stitch(Composition composition, Class<? extends Entity> type) {
+    public static void stitch(CompositionFactory factory, Class<? extends Entity> type, Synchronizer synchronizer) {
+        /* Create the new composition */
+        Composition composition = factory.create(synchronizer);
+
         /* Create a new array if it isn't there */
         genericStitches.computeIfAbsent(type, t -> Lists.newArrayList());
 
@@ -77,15 +89,25 @@ public class Thimble {
         genericStitches.get(type).add(composition);
     }
 
+    /**
+     * Stitches a unique {@link Composition} to the given {@link Entity} object.
+     * @param factory the {@link CompositionFactory} to generate the {@link Composition}
+     * @param entity the {@link Entity} to stitch the {@link Composition} to
+     */
     public static void stitch(CompositionFactory factory, Entity entity) {
-        stitch(factory.create(), entity);
+        stitch(factory, entity, new Synchronizer(UUID.randomUUID()));
     }
 
     /**
      * Stitches a unique {@link Composition} to the given {@link Entity} object.
-     * @param composition the {@link Composition}
+     * @param factory the {@link CompositionFactory} to generate the {@link Composition}
+     * @param entity the {@link Entity} to stitch the {@link Composition} to
+     * @param synchronizer the {@link Synchronizer} that the {@link Composition} will use
      */
-    public static void stitch(Composition composition, Entity entity) {
+    public static void stitch(CompositionFactory factory, Entity entity, Synchronizer synchronizer) {
+        /* Create the new composition */
+        Composition composition = factory.create(synchronizer);
+
         /* Create a new array if it isn't there */
         uniqueStitches.computeIfAbsent(entity, e -> Lists.newArrayList());
 
@@ -134,6 +156,18 @@ public class Thimble {
             out.addAll(genericStitches.get(type));
         }
 
+        return out;
+    }
+
+    /**
+     * Builds a list of every stitch that is listed in
+     * genericStitches and uniqueStitches.
+     * @return the list of {@link Composition} objects
+     */
+    public static List<Composition> getAllStitches() {
+        List<Composition> out = Lists.newArrayList();
+        genericStitches.forEach((key, value) -> out.addAll(value));
+        uniqueStitches.forEach((key, value) -> out.addAll(value));
         return out;
     }
 }
