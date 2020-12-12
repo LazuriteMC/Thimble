@@ -3,7 +3,9 @@ package dev.lazurite.thimble.synchronizer;
 import com.google.common.collect.Lists;
 import dev.lazurite.thimble.synchronizer.key.SynchronizedKey;
 import dev.lazurite.thimble.synchronizer.key.SynchronizedKeyRegistry;
+import dev.lazurite.thimble.synchronizer.packet.SynchronizeEntryS2C;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.World;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,12 +19,14 @@ import java.util.List;
 public class Synchronizer {
     private final List<Entry<?>> entries = Lists.newArrayList();
 
-    /**
-     * Checks for dirty entries.
-     */
-    public void tick() {
+    public Synchronizer() {
+
+    }
+
+    public void tick(World world) {
         this.entries.forEach(entry -> {
             if (entry.dirty) {
+                SynchronizeEntryS2C.send(this, entry, world);
                 // send packet
             }
         });

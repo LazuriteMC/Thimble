@@ -1,8 +1,8 @@
 package dev.lazurite.thimble.composition.packet;
 
+import dev.lazurite.thimble.Thimble;
 import dev.lazurite.thimble.composition.Composition;
-import dev.lazurite.thimble.composition.register.CompositionTracker;
-import dev.lazurite.thimble.composition.register.CompositionRegistry;
+import dev.lazurite.thimble.composition.CompositionFactory;
 import dev.lazurite.thimble.side.server.ServerInitializer;
 import io.netty.buffer.Unpooled;
 import net.fabricmc.fabric.api.network.ClientSidePacketRegistry;
@@ -19,22 +19,22 @@ import java.util.stream.Stream;
 
 /**
  * This packet is used for facilitating {@link Composition}
- * attachment on the client after being done on the server.
+ * stitching on the client after being done on the server.
  * It also handles when an {@link Entity} with a
- * {@link Composition} attached comes into range of the player.
+ * {@link Composition} stitched comes into range of the player.
  * @author Ethan Johnson
  */
-public class AttachCompositionS2C {
+public class StitchCompositionS2C {
     /**
      * The packet's {@link Identifier} used for distinguishing it when received.
      */
-    public static final Identifier PACKET_ID = new Identifier(ServerInitializer.MODID, "attach_composition");
+    public static final Identifier PACKET_ID = new Identifier(ServerInitializer.MODID, "stitch_composition_s2c");
 
     /**
      * Handles when the packet is received on the client. First checks if
      * the given {@link Entity} exists, then checks to make sure the
      * {@link Composition} is registered. Then the {@link Composition}
-     * is attached.
+     * is stitched in.
      * @param context packet context information
      * @param buf the contents of the packet
      */
@@ -43,15 +43,17 @@ public class AttachCompositionS2C {
         Identifier compId = buf.readIdentifier();
         int entityId = buf.readInt();
 
-        /* Attach a new composition on the client */
+        /* Stitch a new composition on the client */
         context.getTaskQueue().execute(() -> {
             if (player.getEntityWorld() != null) {
                 Entity entity = player.getEntityWorld().getEntityById(entityId);
-                Composition composition = CompositionRegistry.get(compId);
+                CompositionFactory composition = Thimble.getRegistered(compId);
 
-                if (entity != null) {
-                    if (!CompositionTracker.get(entity).contains(composition)) {
-                        CompositionTracker.attach(composition, entity);
+                if (entity != null && composition != null) {
+                    for (Composition entry : Thimble.getStitches(entity)) {
+                        if (entry.getIdentifier().equals(compId)) {
+                            Thimble.stitch(composition, entity);
+                        }
                     }
                 }
             }
@@ -59,10 +61,10 @@ public class AttachCompositionS2C {
     }
 
     /**
-     * This method is called whenever you have a {@link Composition} attached
+     * This method is called whenever you have a {@link Composition} stitched
      * to a specific {@link Entity} on the server but the client may or may not have it.
-     * @param composition the {@link Composition} to attach.
-     * @param entity the {@link Entity} to which the {@link Composition} will be attached
+     * @param composition the {@link Composition} to stitch
+     * @param entity the {@link Entity} to which the {@link Composition} will be stitched
      */
     public static void send(Composition composition, Entity entity) {
         PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
@@ -70,7 +72,7 @@ public class AttachCompositionS2C {
         /* Composition Registration ID */
         buf.writeIdentifier(composition.getIdentifier());
 
-        /* Attached Entity ID */
+        /* Stitched Entity ID */
         buf.writeInt(entity.getEntityId());
 
         /* Send it! */
@@ -82,6 +84,6 @@ public class AttachCompositionS2C {
      * Registers the packet in on the client.
      */
     public static void register() {
-        ClientSidePacketRegistry.INSTANCE.register(PACKET_ID, AttachCompositionS2C::accept);
+        ClientSidePacketRegistry.INSTANCE.register(PACKET_ID, StitchCompositionS2C::accept);
     }
 }

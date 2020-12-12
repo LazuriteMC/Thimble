@@ -1,6 +1,6 @@
 package dev.lazurite.thimble.side.client;
 
-import dev.lazurite.thimble.composition.packet.AttachCompositionS2C;
+import dev.lazurite.thimble.composition.packet.StitchCompositionS2C;
 import net.fabricmc.api.ClientModInitializer;
 
 /**
@@ -8,11 +8,10 @@ import net.fabricmc.api.ClientModInitializer;
  * @author Ethan Johnson
  */
 public class ClientInitializer implements ClientModInitializer {
-    /**
-     * Register the {@link AttachCompositionS2C} packet.
-     */
+
     @Override
     public void onInitializeClient() {
-        AttachCompositionS2C.register();
+        StitchCompositionS2C.register();
     }
+
 }

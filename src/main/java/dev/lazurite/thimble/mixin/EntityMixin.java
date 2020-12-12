@@ -1,11 +1,12 @@
 package dev.lazurite.thimble.mixin;
 
+import dev.lazurite.thimble.Thimble;
 import dev.lazurite.thimble.composition.Composition;
-import dev.lazurite.thimble.composition.packet.AttachCompositionS2C;
-import dev.lazurite.thimble.composition.register.CompositionRegistry;
-import dev.lazurite.thimble.composition.register.CompositionTracker;
+import dev.lazurite.thimble.composition.CompositionFactory;
+import dev.lazurite.thimble.composition.packet.StitchCompositionS2C;
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.util.Identifier;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -26,7 +27,7 @@ public class EntityMixin {
     private final Entity entity = (Entity) (Object) this;
 
     /**
-     * Injected right after readCustomDataFromTag is called,
+     * Injected right before readCustomDataFromTag is called,
      * this mixin reads {@link Composition} data from disk.
      * @param tag the {@link CompoundTag} to read from
      * @param info required by every mixin injection
@@ -40,48 +41,46 @@ public class EntityMixin {
     )
     public void fromTag(CompoundTag tag, CallbackInfo info) {
         /* The number of compositions associated with this entity */
-        int compositionNumber = tag.getInt("CompositionCount");
+        int compositionNumber = tag.getInt("cc");
 
+        /* Loop through to retrieve each Composition from the tag */
         for (int i = 0; i < compositionNumber; i++) {
-            String identifier = tag.getString("Composition" + i);
+            Identifier identifier = new Identifier(tag.getString("c" + i));
 
-            if (identifier != null) {
-                Composition composition = CompositionRegistry.get(identifier);
+            CompositionFactory factory= Thimble.getRegistered(identifier);
 
-                if (composition != null) {
-                    /* Attach the newly created composition */
-                    CompositionTracker.attach(composition, entity);
+            /* Attach the newly created composition */
+            Thimble.stitch(factory, entity);
 
-                    /* Loads the synchronizer from the tag also */
-                    composition.getSynchronizer().fromTag(tag);
-                }
-            }
+            /* Loads the synchronizer from the tag also */
+            composition.getSynchronizer().fromTag(tag);
         }
     }
 
     /**
-     * Injected right after readCustomDataFromTag is called,
+     * Injected right before writeCustomDataToTag is called,
      * this mixin writes {@link Composition} data to disk.
      * @param tag the {@link CompoundTag} to write to
      * @param info required by every mixin injection
      */
     @Inject(
             method = "toTag",
+            cancellable = true,
             at = @At(
                     value = "INVOKE",
                     target = "Lnet/minecraft/entity/Entity;writeCustomDataToTag(Lnet/minecraft/nbt/CompoundTag;)V"
             )
     )
     public void toTag(CompoundTag tag, CallbackInfoReturnable<CompoundTag> info) {
-        List<Composition> compositions = CompositionTracker.get(entity);
+        List<Composition> compositions = Thimble.getStitches(entity);
 
         if (!compositions.isEmpty()) {
             /* Write the number of compositions associated with this entity. */
-            tag.putInt("CompositionCount", compositions.size());
+            tag.putInt("cc", compositions.size());
 
             for (int i = 0; i < compositions.size(); i++) {
-                /* Write each composition in the form of "Composition1, Composition2, Composition3, etc." */
-                tag.putString("Composition" + i, compositions.get(i).getIdentifier().toString());
+                /* Write each composition in the form of "c1, c2, c3, etc." */
+                tag.putString("c" + i, compositions.get(i).getIdentifier().toString());
 
                 /* Write the composition's synchronizer object */
                 compositions.get(i).getSynchronizer().toTag(tag);
@@ -100,8 +99,8 @@ public class EntityMixin {
          * All generic compositions associated with this entity. These
          * come first in order to get the general ones out of the way.
          */
-        CompositionTracker.get(entity.getClass()).forEach(entry -> {
-            entry.getSynchronizer().tick();
+        Thimble.getStitches(entity.getClass()).forEach(entry -> {
+            entry.getSynchronizer().tick(entity.getEntityWorld());
             entry.tick(entity);
         });
 
@@ -109,12 +108,12 @@ public class EntityMixin {
          * All unique compositions associated with this entity. It specifically
          * comes after generic compositions so that they may override them.
          */
-        CompositionTracker.get(entity).forEach(entry -> {
+        Thimble.getStitches(entity).forEach(entry -> {
             if (!entity.getEntityWorld().isClient()) {
-                AttachCompositionS2C.send(entry, entity);
+                StitchCompositionS2C.send(entry, entity);
             }
 
-            entry.getSynchronizer().tick();
+            entry.getSynchronizer().tick(entity.getEntityWorld());
             entry.tick(entity);
         });
     }

@@ -5,12 +5,15 @@ import net.minecraft.entity.Entity;
 import net.minecraft.util.Identifier;
 
 /**
- * The main class that you want to extend from. This class allows you
- * to define custom behavior for any {@link Entity} attached with
- * a {@link Composition} attached.
+ * The main class that you want to extend from. This class allows you to define
+ * custom behavior for any {@link Entity} with a {@link Composition} stitched to it.
  * @author Ethan Johnson
  */
 public abstract class Composition {
+    /**
+     * The {@link Synchronizer} used for syncing values
+     * between the client and the server.
+     */
     private final Synchronizer synchronizer;
 
     /**
@@ -20,13 +23,6 @@ public abstract class Composition {
     public Composition() {
         this.synchronizer = new Synchronizer();
         this.initSynchronizer();
-    }
-
-    /**
-     * @return the {@link Synchronizer} object
-     */
-    public Synchronizer getSynchronizer() {
-        return this.synchronizer;
     }
 
     /**
@@ -48,6 +44,13 @@ public abstract class Composition {
      * in your {@link Composition} implementation.
      */
     public abstract Identifier getIdentifier();
+
+    /**
+     * @return the {@link Synchronizer} object
+     */
+    public Synchronizer getSynchronizer() {
+        return this.synchronizer;
+    }
 
     @Override
     public boolean equals(Object obj) {

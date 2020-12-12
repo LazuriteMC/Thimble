@@ -14,16 +14,16 @@ import net.minecraft.world.World;
  */
 public class SmokeComposition extends Composition {
     /**
-     * The identifier, necessary for communicating {@link Composition} info
-     * over the network and saving to {@link net.minecraft.nbt.CompoundTag} objects.
+     * The identifier which allows the game to distinguish it when serialized
+     * within a packet or a {@link net.minecraft.nbt.CompoundTag}.
      */
-    public static final Identifier identifier = new Identifier(ServerInitializer.MODID, "particle");
+    public static final Identifier identifier = new Identifier(ServerInitializer.MODID, "smoke");
 
     /**
      * Default constructor, necessary in order to register the {@link Composition}.
      */
-    public SmokeComposition() {
-
+    public SmokeComposition(int entityId) {
+        super(entityId);
     }
 
     /**
@@ -51,9 +51,6 @@ public class SmokeComposition extends Composition {
 
     }
 
-    /**
-     * @return the {@link Identifier} defined at the top of the class.
-     */
     @Override
     public Identifier getIdentifier() {
         return identifier;

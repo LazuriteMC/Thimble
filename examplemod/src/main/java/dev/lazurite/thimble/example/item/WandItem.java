@@ -1,8 +1,5 @@
 package dev.lazurite.thimble.example.item;
 
-import dev.lazurite.thimble.composition.register.CompositionTracker;
-import dev.lazurite.thimble.example.composition.FloatAwayComposition;
-import dev.lazurite.thimble.example.composition.SmokeComposition;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
@@ -58,8 +55,8 @@ public class WandItem extends Item {
 
                 /* Attach a couple of compositions to those entities */
                 list.forEach(entity -> {
-                    CompositionTracker.attach(new FloatAwayComposition(0.2f), entity);
-                    CompositionTracker.attach(new SmokeComposition(), entity);
+//                    CompositionTracker.attach(FloatAwayComposition::new, entity);
+//                    CompositionTracker.attach(new SmokeComposition(), entity);
                 });
 
                 return TypedActionResult.success(itemStack);

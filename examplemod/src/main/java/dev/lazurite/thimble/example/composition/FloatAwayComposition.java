@@ -15,8 +15,8 @@ import net.minecraft.world.World;
  */
 public class FloatAwayComposition extends Composition {
     /**
-     * The identifier, necessary for communicating {@link Composition} info
-     * over the network and saving to {@link net.minecraft.nbt.CompoundTag} objects.
+     * The identifier which allows the game to distinguish it when serialized
+     * within a packet or a {@link net.minecraft.nbt.CompoundTag}.
      */
     public static final Identifier identifier = new Identifier(ServerInitializer.MODID, "float_away");
 
@@ -29,16 +29,8 @@ public class FloatAwayComposition extends Composition {
     /**
      * Default constructor, necessary in order to register the {@link Composition}.
      */
-    public FloatAwayComposition() {
-
-    }
-
-    /**
-     * A constructor which allows you to set the rate on creation.
-     * @param rate the rate of upwards movement
-     */
-    public FloatAwayComposition(float rate) {
-        getSynchronizer().set(RATE, rate);
+    public FloatAwayComposition(int entityId) {
+        super(entityId);
     }
 
     /**
@@ -65,9 +57,6 @@ public class FloatAwayComposition extends Composition {
         getSynchronizer().track(RATE);
     }
 
-    /**
-     * @return the {@link Identifier} defined at the top of the class.
-     */
     @Override
     public Identifier getIdentifier() {
         return identifier;
