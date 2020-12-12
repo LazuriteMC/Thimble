@@ -6,6 +6,8 @@ import dev.lazurite.thimble.synchronizer.key.SynchronizedKey;
 import dev.lazurite.thimble.synchronizer.key.SynchronizedKeyRegistry;
 import dev.lazurite.thimble.synchronizer.type.SynchronizedTypeRegistry;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 
@@ -29,8 +31,8 @@ public class FloatAwayComposition extends Composition {
     /**
      * Default constructor, necessary in order to register the {@link Composition}.
      */
-    public FloatAwayComposition(int entityId) {
-        super(entityId);
+    public FloatAwayComposition() {
+
     }
 
     /**
@@ -49,6 +51,25 @@ public class FloatAwayComposition extends Composition {
     }
 
     /**
+     * Sets the {@link Entity} speed to zero.
+     * @param player the {@link PlayerEntity} who is interacting
+     * @param hand the {@link Hand} of the {@link PlayerEntity}
+     */
+    @Override
+    public void interact(PlayerEntity player, Hand hand) {
+        getSynchronizer().set(RATE, 0.0f);
+    }
+
+    /**
+     * Called when the {@link Entity} is
+     * removed from the {@link World}.
+     */
+    @Override
+    public void remove() {
+
+    }
+
+    /**
      * This is where the rate value is set up to be tracked by
      * the {@link dev.lazurite.thimble.synchronizer.Synchronizer}.
      */
@@ -57,6 +78,10 @@ public class FloatAwayComposition extends Composition {
         getSynchronizer().track(RATE);
     }
 
+    /**
+     * Gets the {@link Identifier} for this {@link Composition}.
+     * @return the {@link Identifier}
+     */
     @Override
     public Identifier getIdentifier() {
         return identifier;

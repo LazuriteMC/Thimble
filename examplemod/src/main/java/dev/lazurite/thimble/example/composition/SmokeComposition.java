@@ -2,9 +2,14 @@ package dev.lazurite.thimble.example.composition;
 
 import dev.lazurite.thimble.composition.Composition;
 import dev.lazurite.thimble.example.ServerInitializer;
+import dev.lazurite.thimble.synchronizer.key.SynchronizedKey;
+import dev.lazurite.thimble.synchronizer.key.SynchronizedKeyRegistry;
+import dev.lazurite.thimble.synchronizer.type.SynchronizedTypeRegistry;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.particle.ParticleTypes;
+import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 
@@ -20,10 +25,16 @@ public class SmokeComposition extends Composition {
     public static final Identifier identifier = new Identifier(ServerInitializer.MODID, "smoke");
 
     /**
+     * A synchronized value, representing whether or
+     * not the {@link Entity} should emit smoke.
+     */
+    public static final SynchronizedKey<Boolean> SHOULD_SMOKE = SynchronizedKeyRegistry.register(new Identifier(ServerInitializer.MODID, "should_smoke"), SynchronizedTypeRegistry.BOOLEAN, true);
+
+    /**
      * Default constructor, necessary in order to register the {@link Composition}.
      */
-    public SmokeComposition(int entityId) {
-        super(entityId);
+    public SmokeComposition() {
+
     }
 
     /**
@@ -36,19 +47,37 @@ public class SmokeComposition extends Composition {
         World world = entity.getEntityWorld();
 
         /* Only do this sort of thing on the client */
-        if (world.isClient()) {
+        if (world.isClient() && getSynchronizer().get(SHOULD_SMOKE)) {
             ClientWorld clientWorld = (ClientWorld) world;
             clientWorld.addParticle(ParticleTypes.LARGE_SMOKE, true, entity.getX(), entity.getY(), entity.getZ(), 0, 0, 0);
         }
     }
 
     /**
-     * This method doesn't contain anything because this {@link Composition}
-     * doesn't have any synchronized values to track.
+     * Sets the {@link Entity} to not smoke.
+     * @param player the {@link PlayerEntity} who is interacting
+     * @param hand the {@link Hand} of the {@link PlayerEntity}
+     */
+    @Override
+    public void interact(PlayerEntity player, Hand hand) {
+        getSynchronizer().set(SHOULD_SMOKE, false);
+    }
+
+    /**
+     * Called when the {@link Entity} is
+     * removed from the {@link World}.
+     */
+    @Override
+    public void remove() {
+
+    }
+
+    /**
+     * This only contains one synchronized value.
      */
     @Override
     public void initSynchronizer() {
-
+        getSynchronizer().track(SHOULD_SMOKE);
     }
 
     @Override

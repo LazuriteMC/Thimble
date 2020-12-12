@@ -49,14 +49,15 @@ public class Thimble {
         return registry.get(identifier);
     }
 
+    public static void stitch(CompositionFactory factory, Class<? extends Entity> entity) {
+        stitch(factory.create(), entity);
+    }
+
     /**
      * Stitches a generic {@link Composition} to a {@link Class} of type {@link Entity}.
-     * @param factory the {@link Composition}
+     * @param composition the {@link Composition}
      */
-    public static void stitch(CompositionFactory factory, Class<? extends Entity> type) {
-        /* Create the composition */
-        Composition composition = factory.create();
-
+    public static void stitch(Composition composition, Class<? extends Entity> type) {
         /* Create a new array if it isn't there */
         genericStitches.computeIfAbsent(type, t -> Lists.newArrayList());
 
@@ -76,14 +77,15 @@ public class Thimble {
         genericStitches.get(type).add(composition);
     }
 
+    public static void stitch(CompositionFactory factory, Entity entity) {
+        stitch(factory.create(), entity);
+    }
+
     /**
      * Stitches a unique {@link Composition} to the given {@link Entity} object.
-     * @param factory the {@link Composition}
+     * @param composition the {@link Composition}
      */
-    public static void stitch(CompositionFactory factory, Entity entity) {
-        /* Create the composition */
-        Composition composition = factory.create();
-
+    public static void stitch(Composition composition, Entity entity) {
         /* Create a new array if it isn't there */
         uniqueStitches.computeIfAbsent(entity, e -> Lists.newArrayList());
 

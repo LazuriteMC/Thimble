@@ -2,6 +2,8 @@ package dev.lazurite.thimble.composition;
 
 import dev.lazurite.thimble.synchronizer.Synchronizer;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
 
 /**
@@ -32,6 +34,21 @@ public abstract class Composition {
      * @param entity the entity which this {@link Composition} is attached to
      */
     public abstract void tick(Entity entity);
+
+
+    /**
+     * Called whenever a {@link PlayerEntity} interacts with the
+     * {@link Entity} that this {@link Composition} is stitched into.
+     * @param player the {@link PlayerEntity} who is interacting
+     * @param hand the {@link Hand} of the {@link PlayerEntity}
+     */
+    public abstract void interact(PlayerEntity player, Hand hand);
+
+    /**
+     * Called whenever the {@link Entity} is removed
+     * from the {@link net.minecraft.world.World}.
+     */
+    public abstract void remove();
 
     /**
      * Initializes the {@link Synchronizer}. This is where
