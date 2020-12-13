@@ -15,6 +15,7 @@
   },
 
   "license": "MIT",
+  "icon": "assets/thimble/icon.png",
   "environment": "*",
   "entrypoints": {
     "main": [

@@ -3,7 +3,7 @@
   "id": "examplemod",
   "version": "${version}",
 
-  "name": "Thibmle Example Mod",
+  "name": "Thimble Example Mod",
   "description": "Example mod for Thimble",
   "authors": [
     "Lazurite Team"
