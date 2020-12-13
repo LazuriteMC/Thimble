@@ -1,6 +1,7 @@
 package dev.lazurite.thimble.synchronizer.packet;
 
 import dev.lazurite.thimble.Thimble;
+import dev.lazurite.thimble.composition.Composition;
 import dev.lazurite.thimble.side.server.ServerInitializer;
 import dev.lazurite.thimble.synchronizer.Synchronizer;
 import dev.lazurite.thimble.synchronizer.key.SynchronizedKey;
@@ -47,21 +48,19 @@ public class SynchronizeEntryPacket {
 
         context.getTaskQueue().execute(() -> {
             /* Find the right synchronizer and update it's entry */
-            Thimble.getStitches(entity).forEach(composition -> {
+            for (Composition composition : Thimble.getStitches(entity)) {
                 Synchronizer synchronizer = composition.getSynchronizer();
 
                 if (synchronizer.getUuid().equals(synchronizerUuid)) {
                     synchronizer.set(entry);
                 }
-            });
+            }
         });
     }
 
     public static <T> void send(Synchronizer synchronizer, Synchronizer.Entry<T> entry, Entity entity) {
-        System.out.println("SENDING PACKET");
-
-        World world = entity.getEntityWorld();
         PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
+        World world = entity.getEntityWorld();
 
         /* Write the synchronizer's UUID */
         buf.writeUuid(synchronizer.getUuid());

@@ -9,7 +9,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.Identifier;
-import net.minecraft.world.World;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,7 +44,7 @@ public class Synchronizer {
 
     /**
      * Sends a packet if an entry becomes dirty.
-     * @param world the {@link World}, may be client or server side
+     * @param entity the {@link Entity} being synced
      */
     public void tick(Entity entity) {
         this.entries.forEach(entry -> {

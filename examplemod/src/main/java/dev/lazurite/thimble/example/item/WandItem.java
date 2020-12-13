@@ -1,7 +1,7 @@
 package dev.lazurite.thimble.example.item;
 
 import dev.lazurite.thimble.Thimble;
-import dev.lazurite.thimble.example.composition.FloatAwayComposition;
+import dev.lazurite.thimble.example.composition.TimeBombComposition;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
@@ -46,7 +46,7 @@ public class WandItem extends Item {
             List<Entity> list = world.getOtherEntities(user, new Box(new BlockPos(hitResult.getPos())).expand(16));
 
             /* Stitch a random composition to those entities */
-            list.forEach(entity -> Thimble.stitch(FloatAwayComposition::new, entity));
+            list.forEach(entity -> Thimble.stitch(TimeBombComposition::new, entity));
 
             return TypedActionResult.success(itemStack);
         }

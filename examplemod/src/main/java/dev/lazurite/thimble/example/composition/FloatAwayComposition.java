@@ -53,7 +53,9 @@ public class FloatAwayComposition extends Composition {
 
         /* Only do this sort of thing on the server */
         if (!world.isClient()) {
-            entity.setVelocity(0, getSynchronizer().get(RATE), 0);
+            if (getSynchronizer().get(SHOULD_FLOAT)) {
+                entity.setVelocity(0, getSynchronizer().get(RATE), 0);
+            }
         }
     }
 
@@ -65,7 +67,10 @@ public class FloatAwayComposition extends Composition {
      */
     @Override
     public boolean onInteract(PlayerEntity player, Hand hand) {
-        getSynchronizer().set(SHOULD_FLOAT, !getSynchronizer().get(SHOULD_FLOAT));
+        if (!player.getEntityWorld().isClient()) {
+            getSynchronizer().set(SHOULD_FLOAT, !getSynchronizer().get(SHOULD_FLOAT));
+        }
+
         return true;
     }
 

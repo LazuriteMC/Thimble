@@ -1,6 +1,6 @@
 package dev.lazurite.thimble.mixin;
 
-import com.google.common.collect.Sets;
+import com.google.common.collect.Lists;
 import dev.lazurite.thimble.Thimble;
 import dev.lazurite.thimble.composition.Composition;
 import dev.lazurite.thimble.composition.CompositionFactory;
@@ -20,7 +20,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.List;
-import java.util.Set;
 
 /**
  * This mixin mainly deals with giving {@link Composition}
@@ -37,7 +36,7 @@ public class EntityMixin implements EntityCompositionsStorage {
     /**
      * The set of {@link Composition} objects that the {@link Entity} possesses.
      */
-    private final Set<Composition> compositions = Sets.newHashSet();
+    private final List<Composition> compositions = Lists.newArrayList();
 
     /**
      * Injected right before readCustomDataFromTag is called,
@@ -126,14 +125,14 @@ public class EntityMixin implements EntityCompositionsStorage {
     @Inject(method = "tick()V", at = @At("HEAD"))
     public void tick(CallbackInfo info) {
         /* All stitches associated with this entity */
-        Thimble.getStitches(entity).forEach(entry -> {
+        for (Composition composition : getCompositions()) {
             if (!entity.getEntityWorld().isClient()) {
-                StitchCompositionS2C.send(entry, entity);
+                StitchCompositionS2C.send(composition, entity);
             }
 
-            entry.getSynchronizer().tick(entity);
-            entry.onTick(entity);
-        });
+            composition.getSynchronizer().tick(entity);
+            composition.onTick(entity);
+        }
     }
 
     /**
@@ -149,7 +148,7 @@ public class EntityMixin implements EntityCompositionsStorage {
         boolean shouldSwingHand = false;
 
         /* Gets all stitches associated with this entity */
-        for (Composition composition : Thimble.getStitches(entity)) {
+        for (Composition composition : getCompositions()) {
             if (composition.onInteract(player, hand)) {
                 shouldSwingHand = true;
             }
@@ -169,10 +168,7 @@ public class EntityMixin implements EntityCompositionsStorage {
     @Inject(method = "remove", at = @At("HEAD"))
     public void remove(CallbackInfo info) {
         /* Gets all stitches associated with this entity */
-        Thimble.getStitches(entity).forEach(composition -> {
-            composition.onRemove();
-            Thimble.remove(entity, composition);
-        });
+        getCompositions().forEach(Composition::onRemove);
     }
 
     /**
@@ -181,7 +177,9 @@ public class EntityMixin implements EntityCompositionsStorage {
      */
     @Override
     public void addComposition(Composition composition) {
-        compositions.add(composition);
+        if (!compositions.contains(composition)) {
+            compositions.add(composition);
+        }
     }
 
     /**
@@ -189,7 +187,7 @@ public class EntityMixin implements EntityCompositionsStorage {
      * @return the list of {@link Composition} objects
      */
     @Override
-    public Set<Composition> getCompositions() {
+    public List<Composition> getCompositions() {
         return compositions;
     }
 }

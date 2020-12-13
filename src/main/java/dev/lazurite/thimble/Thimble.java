@@ -69,17 +69,8 @@ public class Thimble {
             throw new CompositionRegistryException("Unable to attach unregistered composition");
         }
 
-        /* Add it to the map */
+        /* Add it to the set */
         entityStorage.addComposition(composition);
-    }
-
-    /**
-     * Used when an {@link Entity} is removed.
-     * @param entity the removed {@link Entity}
-     * @param composition the {@link Composition} to remove
-     */
-    public static void remove(Entity entity, Composition composition) {
-        ((EntityCompositionsStorage) (Object) entity).getCompositions().remove(composition);
     }
 
     /**
@@ -90,8 +81,6 @@ public class Thimble {
      * @return a list of {@link Composition} objects
      */
     public static List<Composition> getStitches(Entity entity) {
-        List<Composition> out = Lists.newArrayList();
-        out.addAll(((EntityCompositionsStorage) (Object) entity).getCompositions());
-        return out;
+        return Lists.newArrayList(((EntityCompositionsStorage) (Object) entity).getCompositions());
     }
 }

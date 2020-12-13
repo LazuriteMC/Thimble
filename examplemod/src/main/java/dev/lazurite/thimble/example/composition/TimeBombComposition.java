@@ -43,7 +43,7 @@ public class TimeBombComposition extends Composition {
      */
     public TimeBombComposition(Synchronizer synchronizer) {
         super(synchronizer);
-        getSynchronizer().set(TIMER, 500);
+        getSynchronizer().set(TIMER, 60);
     }
 
     /**
@@ -56,15 +56,17 @@ public class TimeBombComposition extends Composition {
         World world = entity.getEntityWorld();
         int timeLeft = getSynchronizer().get(TIMER);
 
-        if (world.isClient()) {
-            ClientWorld clientWorld = (ClientWorld) world;
-            clientWorld.addParticle(ParticleTypes.LARGE_SMOKE, true, entity.getX(), entity.getY(), entity.getZ(), 0, 0, 0);
-        } else {
-            if (timeLeft <= 0) {
-                entity.getEntityWorld().createExplosion(entity, entity.getX(), entity.getBodyY(0.0625D), entity.getZ(), 8.0F, Explosion.DestructionType.BREAK);
-                entity.kill();
+        if (getSynchronizer().get(ARMED)) {
+            if (world.isClient()) {
+                ClientWorld clientWorld = (ClientWorld) world;
+                clientWorld.addParticle(ParticleTypes.LARGE_SMOKE, true, entity.getX(), entity.getY(), entity.getZ(), 0, 0, 0);
             } else {
-                getSynchronizer().set(TIMER, timeLeft - 1);
+                if (timeLeft <= 0) {
+                    entity.getEntityWorld().createExplosion(null, entity.getX(), entity.getBodyY(0.0625D), entity.getZ(), 8.0F, Explosion.DestructionType.BREAK);
+                    getSynchronizer().set(ARMED, false);
+                } else {
+                    getSynchronizer().set(TIMER, timeLeft - 1);
+                }
             }
         }
     }
@@ -77,7 +79,10 @@ public class TimeBombComposition extends Composition {
      */
     @Override
     public boolean onInteract(PlayerEntity player, Hand hand) {
-        getSynchronizer().set(ARMED, false);
+        if (player.getEntityWorld().isClient()) {
+            getSynchronizer().set(ARMED, false);
+        }
+
         return true;
     }
 

@@ -2,9 +2,9 @@ package dev.lazurite.thimble.util;
 
 import dev.lazurite.thimble.composition.Composition;
 
-import java.util.Set;
+import java.util.List;
 
 public interface EntityCompositionsStorage {
     void addComposition(Composition composition);
-    Set<Composition> getCompositions();
+    List<Composition> getCompositions();
 }
