@@ -16,5 +16,4 @@ public class ClientInitializer implements ClientModInitializer {
         ClientSidePacketRegistry.INSTANCE.register(StitchCompositionS2C.PACKET_ID, StitchCompositionS2C::accept);
         ClientSidePacketRegistry.INSTANCE.register(SynchronizeEntryPacket.PACKET_ID, SynchronizeEntryPacket::accept);
     }
-
 }

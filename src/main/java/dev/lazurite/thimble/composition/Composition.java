@@ -2,7 +2,6 @@ package dev.lazurite.thimble.composition;
 
 import dev.lazurite.thimble.synchronizer.Synchronizer;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
@@ -29,34 +28,27 @@ public abstract class Composition {
     }
 
     /**
-     * This is where you can define your custom
+     * This is where you can define your ticking custom
      * behavior. An override of this method is
      * required when you extend this class.
      * @param entity the entity which this {@link Composition} is attached to
      */
-    public abstract void tick(Entity entity);
+    public abstract void onTick(Entity entity);
 
     /**
      * Called whenever a {@link PlayerEntity} interacts with the
      * {@link Entity} that this {@link Composition} is stitched into.
      * @param player the {@link PlayerEntity} who is interacting
      * @param hand the {@link Hand} of the {@link PlayerEntity}
+     * @return whether or not the player should swing their hand
      */
-    public abstract void interact(PlayerEntity player, Hand hand);
-
-    /**
-     * Called whenever the stitched {@link Entity} is
-     * damaged in some way.
-     * @param source the source of damage
-     * @param amount the amount of damage taken
-     */
-    public abstract void damage(DamageSource source, float amount);
+    public abstract boolean onInteract(PlayerEntity player, Hand hand);
 
     /**
      * Called whenever the {@link Entity} is removed
      * from the {@link net.minecraft.world.World}.
      */
-    public abstract void remove();
+    public abstract void onRemove();
 
     /**
      * Initializes the {@link Synchronizer}. This is where

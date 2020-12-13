@@ -6,7 +6,6 @@ import dev.lazurite.thimble.composition.CompositionFactory;
 import dev.lazurite.thimble.side.server.ServerInitializer;
 import dev.lazurite.thimble.synchronizer.Synchronizer;
 import io.netty.buffer.Unpooled;
-import net.fabricmc.fabric.api.network.ClientSidePacketRegistry;
 import net.fabricmc.fabric.api.network.PacketContext;
 import net.fabricmc.fabric.api.network.ServerSidePacketRegistry;
 import net.fabricmc.fabric.api.server.PlayerStream;
@@ -48,15 +47,13 @@ public class StitchCompositionS2C {
 
         /* Stitch a new composition on the client */
         context.getTaskQueue().execute(() -> {
-            if (player.getEntityWorld() != null) {
-                Entity entity = player.getEntityWorld().getEntityById(entityId);
-                CompositionFactory composition = Thimble.getRegistered(compId);
+            if (player != null) {
+                if (player.getEntityWorld() != null) {
+                    Entity entity = player.getEntityWorld().getEntityById(entityId);
+                    CompositionFactory factory = Thimble.getRegistered(compId);
 
-                if (entity != null && composition != null) {
-                    for (Composition entry : Thimble.getStitches(entity)) {
-                        if (entry.getIdentifier().equals(compId)) {
-                            Thimble.stitch(composition, entity, new Synchronizer(synchronizerId));
-                        }
+                    if (entity != null && factory != null) {
+                        Thimble.stitch(factory, entity, new Synchronizer(synchronizerId));
                     }
                 }
             }

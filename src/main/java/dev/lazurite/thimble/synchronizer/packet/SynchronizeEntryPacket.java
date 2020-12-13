@@ -3,13 +3,13 @@ package dev.lazurite.thimble.synchronizer.packet;
 import dev.lazurite.thimble.Thimble;
 import dev.lazurite.thimble.side.server.ServerInitializer;
 import dev.lazurite.thimble.synchronizer.Synchronizer;
-import dev.lazurite.thimble.synchronizer.key.SynchronizedKeyRegistry;
+import dev.lazurite.thimble.synchronizer.key.SynchronizedKey;
 import io.netty.buffer.Unpooled;
 import net.fabricmc.fabric.api.network.ClientSidePacketRegistry;
 import net.fabricmc.fabric.api.network.PacketContext;
 import net.fabricmc.fabric.api.network.ServerSidePacketRegistry;
 import net.fabricmc.fabric.api.server.PlayerStream;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.Entity;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
@@ -25,7 +25,7 @@ public class SynchronizeEntryPacket {
     /**
      * The packet's {@link Identifier} used for distinguishing it when received.
      */
-    public static final Identifier PACKET_ID = new Identifier(ServerInitializer.MODID, "synchronize_entry_s2c");
+    public static final Identifier PACKET_ID = new Identifier(ServerInitializer.MODID, "synchronize_entry_packet");
 
     /**
      * Handles when the packet is received on the client.
@@ -33,26 +33,34 @@ public class SynchronizeEntryPacket {
      * @param buf the contents of the packet
      */
     public static void accept(PacketContext context, PacketByteBuf buf) {
-        PlayerEntity player = context.getPlayer();
-
         /* The synchronizer's UUID */
         UUID synchronizerUuid = buf.readUuid();
 
-        /* The key's identifier */
-        Identifier keyIdentifier = buf.readIdentifier();
+        /* The actual key based on the identifier */
+        SynchronizedKey key = Synchronizer.getKey(buf.readIdentifier());
+
+        /* The entry to replace in the synchronizer */
+        Synchronizer.Entry entry = new Synchronizer.Entry(key, key.getType().read(buf));
+
+        /* Get the entity */
+        Entity entity = context.getPlayer().getEntityWorld().getEntityById(buf.readInt());
 
         context.getTaskQueue().execute(() -> {
-            Thimble.getAllStitches().forEach(composition -> {
+            /* Find the right synchronizer and update it's entry */
+            Thimble.getStitches(entity).forEach(composition -> {
                 Synchronizer synchronizer = composition.getSynchronizer();
 
                 if (synchronizer.getUuid().equals(synchronizerUuid)) {
-                    synchronizer.set(SynchronizedKeyRegistry.get(keyIdentifier), buf);
+                    synchronizer.set(entry);
                 }
             });
         });
     }
 
-    public static <T> void send(Synchronizer synchronizer, Synchronizer.Entry<T> entry, World world) {
+    public static <T> void send(Synchronizer synchronizer, Synchronizer.Entry<T> entry, Entity entity) {
+        System.out.println("SENDING PACKET");
+
+        World world = entity.getEntityWorld();
         PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
 
         /* Write the synchronizer's UUID */
@@ -63,6 +71,9 @@ public class SynchronizeEntryPacket {
 
         /* Write the entry value */
         entry.getKey().getType().write(buf, entry.getValue());
+
+        /* Write the entity Id */
+        buf.writeInt(entity.getEntityId());
 
         /* Send it! */
         if (world.isClient()) {

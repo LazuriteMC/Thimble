@@ -1,12 +1,13 @@
 package dev.lazurite.thimble.mixin;
 
+import com.google.common.collect.Sets;
 import dev.lazurite.thimble.Thimble;
 import dev.lazurite.thimble.composition.Composition;
 import dev.lazurite.thimble.composition.CompositionFactory;
 import dev.lazurite.thimble.composition.packet.StitchCompositionS2C;
 import dev.lazurite.thimble.synchronizer.Synchronizer;
+import dev.lazurite.thimble.util.EntityCompositionsStorage;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.ActionResult;
@@ -19,6 +20,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * This mixin mainly deals with giving {@link Composition}
@@ -26,11 +28,16 @@ import java.util.List;
  * @author Ethan Johnson
  */
 @Mixin(Entity.class)
-public class EntityMixin {
+public class EntityMixin implements EntityCompositionsStorage {
     /**
      * The actual {@link Entity} object that this class is mixing into.
      */
     private final Entity entity = (Entity) (Object) this;
+
+    /**
+     * The set of {@link Composition} objects that the {@link Entity} possesses.
+     */
+    private final Set<Composition> compositions = Sets.newHashSet();
 
     /**
      * Injected right before readCustomDataFromTag is called,
@@ -55,10 +62,10 @@ public class EntityMixin {
             CompoundTag innerTag = tag.getCompound("c" + i);
 
             /* Get the composition factory */
-            CompositionFactory factory = Thimble.getRegistered(new Identifier(tag.getString("compositionId")));
+            CompositionFactory factory = Thimble.getRegistered(new Identifier(innerTag.getString("compositionId")));
 
             /* Make a blank synchronizer */
-            Synchronizer synchronizer = new Synchronizer(Synchronizer.NULL_UUID);
+            Synchronizer synchronizer = new Synchronizer(innerTag.getUuid("synchronizerId"));
 
             /* Stitch the composition */
             Thimble.stitch(factory, entity, synchronizer);
@@ -93,9 +100,6 @@ public class EntityMixin {
                 /* The composition for this loop iteration */
                 Composition composition = compositions.get(i);
 
-                /* The synchronizer belonging to the current composition */
-                Synchronizer synchronizer = composition.getSynchronizer();
-
                 /* A new "inner" tag to write to */
                 CompoundTag innerTag = new CompoundTag();
 
@@ -104,6 +108,9 @@ public class EntityMixin {
 
                 /* Write the composition's identifier to the "inner" tag */
                 innerTag.putString("compositionId", composition.getIdentifier().toString());
+
+                /* Write the synchronizer's uuid to the "inner" tag */
+                innerTag.putUuid("synchronizerId", composition.getSynchronizer().getUuid());
 
                 /* Write the synchronizer to the "inner" tag */
                 composition.getSynchronizer().toTag(innerTag);
@@ -118,20 +125,14 @@ public class EntityMixin {
      */
     @Inject(method = "tick()V", at = @At("HEAD"))
     public void tick(CallbackInfo info) {
-        /* All generic stitches associated with this entity */
-        Thimble.getStitches(entity.getClass()).forEach(entry -> {
-            entry.getSynchronizer().tick(entity.getEntityWorld());
-            entry.tick(entity);
-        });
-
-        /* All unique stitches associated with this entity */
+        /* All stitches associated with this entity */
         Thimble.getStitches(entity).forEach(entry -> {
             if (!entity.getEntityWorld().isClient()) {
                 StitchCompositionS2C.send(entry, entity);
             }
 
-            entry.getSynchronizer().tick(entity.getEntityWorld());
-            entry.tick(entity);
+            entry.getSynchronizer().tick(entity);
+            entry.onTick(entity);
         });
     }
 
@@ -143,30 +144,20 @@ public class EntityMixin {
      * @param hand the {@link Hand} of the {@link PlayerEntity}
      * @param info required by every mixin injection
      */
-    @Inject(method = "interact", at = @At("TAIL"))
+    @Inject(method = "interact", at = @At("TAIL"), cancellable = true)
     public void interact(PlayerEntity player, Hand hand, CallbackInfoReturnable<ActionResult> info) {
-        /* Gets all generic stitches associated with this entity */
-        Thimble.getStitches(entity.getClass()).forEach(entry -> entry.interact(player, hand));
+        boolean shouldSwingHand = false;
 
-        /* Gets all unique stitches associated with this entity */
-        Thimble.getStitches(entity).forEach(entry -> entry.interact(player, hand));
-    }
+        /* Gets all stitches associated with this entity */
+        for (Composition composition : Thimble.getStitches(entity)) {
+            if (composition.onInteract(player, hand)) {
+                shouldSwingHand = true;
+            }
+        }
 
-    /**
-     * This injection provides a way for {@link Composition}
-     * objects to detect when their stitched {@link Entity}
-     * takes damage
-     * @param source the source of damage
-     * @param amount the amount of damage taken
-     * @param info required by every mixin injection
-     */
-    @Inject(method = "damage", at = @At("TAIL"))
-    public void damage(DamageSource source, float amount, CallbackInfoReturnable<Boolean> info) {
-        /* Gets all generic stitches associated with this entity */
-        Thimble.getStitches(entity.getClass()).forEach(entry -> entry.damage(source, amount));
-
-        /* Gets all unique stitches associated with this entity */
-        Thimble.getStitches(entity).forEach(entry -> entry.damage(source, amount));
+        if (shouldSwingHand) {
+            info.setReturnValue(ActionResult.SUCCESS);
+        }
     }
 
     /**
@@ -175,12 +166,30 @@ public class EntityMixin {
      * is removed from the {@link net.minecraft.world.World}.
      * @param info required by every mixin injection
      */
-    @Inject(method = "remove", at = @At("TAIL"))
+    @Inject(method = "remove", at = @At("HEAD"))
     public void remove(CallbackInfo info) {
-        /* Gets all generic stitches associated with this entity */
-        Thimble.getStitches(entity.getClass()).forEach(Composition::remove);
+        /* Gets all stitches associated with this entity */
+        Thimble.getStitches(entity).forEach(composition -> {
+            composition.onRemove();
+            Thimble.remove(entity, composition);
+        });
+    }
 
-        /* Gets all unique stitches associated with this entity */
-        Thimble.getStitches(entity).forEach(Composition::remove);
+    /**
+     * Add a {@link Composition} to this specific {@link Entity}.
+     * @param composition the {@link Composition} to add
+     */
+    @Override
+    public void addComposition(Composition composition) {
+        compositions.add(composition);
+    }
+
+    /**
+     * Get all the {@link Composition} objects from this specific {@link Entity}.
+     * @return the list of {@link Composition} objects
+     */
+    @Override
+    public Set<Composition> getCompositions() {
+        return compositions;
     }
 }

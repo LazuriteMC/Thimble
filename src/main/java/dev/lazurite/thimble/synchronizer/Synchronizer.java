@@ -5,6 +5,7 @@ import dev.lazurite.thimble.exception.SynchronizedKeyException;
 import dev.lazurite.thimble.synchronizer.key.SynchronizedKey;
 import dev.lazurite.thimble.synchronizer.packet.SynchronizeEntryPacket;
 import dev.lazurite.thimble.synchronizer.type.SynchronizedType;
+import net.minecraft.entity.Entity;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.Identifier;
@@ -31,7 +32,7 @@ public class Synchronizer {
     private final List<Entry<?>> entries = Lists.newArrayList();
 
     /** The {@link UUID} used for identifying this {@link Synchronizer}. */
-    private UUID uuid;
+    private final UUID uuid;
 
     /**
      * The constructor which takes a {@link UUID}
@@ -46,10 +47,11 @@ public class Synchronizer {
      * Sends a packet if an entry becomes dirty.
      * @param world the {@link World}, may be client or server side
      */
-    public void tick(World world) {
+    public void tick(Entity entity) {
         this.entries.forEach(entry -> {
             if (entry.dirty) {
-                SynchronizeEntryPacket.send(this, entry, world);
+                entry.dirty = false;
+                SynchronizeEntryPacket.send(this, entry, entity);
             }
         });
     }
@@ -61,7 +63,7 @@ public class Synchronizer {
      * @param <T> the type of the {@link SynchronizedKey}
      */
     public <T> void track(SynchronizedKey<T> key) {
-        if (get(key.getIdentifier()) == null) {
+        if (getKey(key.getIdentifier()) == null) {
             throw new SynchronizedKeyException("Unable to use unregistered key");
         }
 
@@ -76,7 +78,7 @@ public class Synchronizer {
      * @param <T> the type of the key/value
      */
     @SuppressWarnings("unchecked")
-    public <T> void set(SynchronizedKey<T> key, T value) {
+    public <T> void set(SynchronizedKey<T> key, T value, boolean dirty) {
         /* Null values are not allowed */
         if (value == null) return;
 
@@ -89,6 +91,8 @@ public class Synchronizer {
                 if (key.getConsumer() != null) {
                     key.getConsumer().accept(value);
                 }
+
+                entry.dirty = dirty;
             }
         }
     }
@@ -96,12 +100,22 @@ public class Synchronizer {
     /**
      * Sets the value of the given {@link SynchronizedKey}
      * to the value stored in the {@link PacketByteBuf}.
-     * @param key the {@link SynchronizedKey}} to change
-     * @param buf the {@link PacketByteBuf} containing the value to change
+     * @param entry the {@link Entry} to change
      * @param <T> the type of the key/value
      */
-    public <T> void set(SynchronizedKey<T> key, PacketByteBuf buf) {
-        set(key, key.getType().read(buf));
+    public <T> void set(Entry<T> entry) {
+        set(entry.getKey(), entry.getValue(), false);
+    }
+
+    /**
+     * Sets the value of the given {@link SynchronizedKey}
+     * to the value stored in the {@link PacketByteBuf}.
+     * @param key the {@link SynchronizedKey} to change
+     * @param value the value to change
+     * @param <T> the type of the key/value
+     */
+    public <T> void set(SynchronizedKey<T> key, T value) {
+        set(key, value, true);
     }
 
     /**
@@ -141,7 +155,6 @@ public class Synchronizer {
      * @param tag the {@link CompoundTag} to write to
      */
     public void toTag(CompoundTag tag) {
-        tag.putUuid("synchronizerId", getUuid());
         entries.forEach(entry -> entry.toTag(tag));
     }
 
@@ -150,7 +163,6 @@ public class Synchronizer {
      * @param tag the {@link CompoundTag} to read from
      */
     public void fromTag(CompoundTag tag) {
-        this.uuid = tag.getUuid("synchronizerId");
         entries.forEach(entry -> entry.fromTag(tag));
     }
 
@@ -182,7 +194,7 @@ public class Synchronizer {
      * @param identifier the {@link Identifier} used for finding the key
      * @return the registered {@link SynchronizedKey}
      */
-    private static SynchronizedKey<?> get(Identifier identifier) {
+    public static SynchronizedKey<?> getKey(Identifier identifier) {
         for (SynchronizedKey<?> key : keyRegistry) {
             if (key.getIdentifier().equals(identifier)) {
                 return key;
@@ -220,10 +232,11 @@ public class Synchronizer {
         }
 
         public void toTag(CompoundTag tag) {
-            getKey().getType().toTag(tag, getKey().getIdentifier().toString(), getValue());
+            getKey().getType().toTag(tag, getKey().toString(), getValue());
         }
 
         public void fromTag(CompoundTag tag) {
+            dirty = true;
             setValue(getKey().getType().fromTag(tag, getKey().toString()));
         }
     }

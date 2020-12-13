@@ -2,10 +2,9 @@ package dev.lazurite.thimble.example;
 
 import dev.lazurite.thimble.Thimble;
 import dev.lazurite.thimble.example.composition.FloatAwayComposition;
-import dev.lazurite.thimble.example.composition.SmokeComposition;
+import dev.lazurite.thimble.example.composition.TimeBombComposition;
 import dev.lazurite.thimble.example.item.WandItem;
 import net.fabricmc.api.ModInitializer;
-import net.minecraft.entity.passive.CowEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.util.Identifier;
@@ -30,9 +29,7 @@ public class ServerInitializer implements ModInitializer {
      */
     static {
         Thimble.register(FloatAwayComposition::new);
-        Thimble.register(SmokeComposition::new);
-
-        Thimble.stitch(SmokeComposition::new, CowEntity.class);
+        Thimble.register(TimeBombComposition::new);
     }
 
     /**

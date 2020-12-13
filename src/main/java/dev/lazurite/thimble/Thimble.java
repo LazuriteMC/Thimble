@@ -6,6 +6,7 @@ import dev.lazurite.thimble.composition.Composition;
 import dev.lazurite.thimble.composition.CompositionFactory;
 import dev.lazurite.thimble.exception.CompositionRegistryException;
 import dev.lazurite.thimble.synchronizer.Synchronizer;
+import dev.lazurite.thimble.util.EntityCompositionsStorage;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.Identifier;
 
@@ -25,16 +26,6 @@ public class Thimble {
     private static final Map<Identifier, CompositionFactory> registry = Maps.newConcurrentMap();
 
     /**
-     * The {@link java.util.HashMap} containing all generically-stitched {@link Composition} objects.
-     */
-    private static final Map<Class<? extends Entity>, List<Composition>> genericStitches = Maps.newConcurrentMap();
-
-    /**
-     * The {@link java.util.HashMap} containing all uniquely-stitched {@link Composition} objects.
-     */
-    private static final Map<Entity, List<Composition>> uniqueStitches = Maps.newConcurrentMap();
-
-    /**
      * The method called in order to register a {@link Composition}.
      * @param factory the {@link CompositionFactory} used to create a new {@link Composition} object
      */
@@ -49,44 +40,6 @@ public class Thimble {
      */
     public static CompositionFactory getRegistered(Identifier identifier) {
         return registry.get(identifier);
-    }
-
-    /**
-     * Stiches a generic {@link Composition} to a {@link Class} of type {@link Entity}.
-     * @param factory the {@link CompositionFactory} to generate the {@link Composition}
-     * @param type the type of {@link Entity}
-     */
-    public static void stitch(CompositionFactory factory, Class<? extends Entity> type) {
-        stitch(factory, type, new Synchronizer(UUID.randomUUID()));
-    }
-
-    /**
-     * Stitches a generic {@link Composition} to a {@link Class} of type {@link Entity}.
-     * @param factory the {@link CompositionFactory} to generate the {@link Composition}
-     * @param type the type of {@link Entity}
-     * @param synchronizer the {@link Synchronizer} that the {@link Composition} will use
-     */
-    public static void stitch(CompositionFactory factory, Class<? extends Entity> type, Synchronizer synchronizer) {
-        /* Create the new composition */
-        Composition composition = factory.create(synchronizer);
-
-        /* Create a new array if it isn't there */
-        genericStitches.computeIfAbsent(type, t -> Lists.newArrayList());
-
-        /* Throw an error if the composition isn't registered */
-        if (getRegistered(composition.getIdentifier()) == null) {
-            throw new CompositionRegistryException("Unable to attach unregistered composition");
-        }
-
-        /* Check if it's a duplicate */
-        for (Composition comp : genericStitches.get(type)) {
-            if (comp.equals(composition)) {
-                return;
-            }
-        }
-
-        /* Add it to the map */
-        genericStitches.get(type).add(composition);
     }
 
     /**
@@ -105,26 +58,28 @@ public class Thimble {
      * @param synchronizer the {@link Synchronizer} that the {@link Composition} will use
      */
     public static void stitch(CompositionFactory factory, Entity entity, Synchronizer synchronizer) {
+        /* Get the Entity Composition Storage object */
+        EntityCompositionsStorage entityStorage = (EntityCompositionsStorage) (Object) entity;
+
         /* Create the new composition */
         Composition composition = factory.create(synchronizer);
-
-        /* Create a new array if it isn't there */
-        uniqueStitches.computeIfAbsent(entity, e -> Lists.newArrayList());
 
         /* Throw an error if the composition isn't registered */
         if (getRegistered(composition.getIdentifier()) == null) {
             throw new CompositionRegistryException("Unable to attach unregistered composition");
         }
 
-        /* Check if it's a duplicate */
-        for (Composition comp : uniqueStitches.get(entity)) {
-            if (comp.equals(composition)) {
-                return;
-            }
-        }
-
         /* Add it to the map */
-        uniqueStitches.get(entity).add(composition);
+        entityStorage.addComposition(composition);
+    }
+
+    /**
+     * Used when an {@link Entity} is removed.
+     * @param entity the removed {@link Entity}
+     * @param composition the {@link Composition} to remove
+     */
+    public static void remove(Entity entity, Composition composition) {
+        ((EntityCompositionsStorage) (Object) entity).getCompositions().remove(composition);
     }
 
     /**
@@ -136,38 +91,7 @@ public class Thimble {
      */
     public static List<Composition> getStitches(Entity entity) {
         List<Composition> out = Lists.newArrayList();
-
-        if (uniqueStitches.containsKey(entity)) {
-            out.addAll(uniqueStitches.get(entity));
-        }
-
-        return out;
-    }
-
-    /**
-     * Gets all {@link Composition} objects associated with
-     * the given class. Returns an empty list if there are none.
-     * @return a list of {@link Composition} objects
-     */
-    public static List<Composition> getStitches(Class<? extends Entity> type) {
-        List<Composition> out = Lists.newArrayList();
-
-        if (genericStitches.containsKey(type)) {
-            out.addAll(genericStitches.get(type));
-        }
-
-        return out;
-    }
-
-    /**
-     * Builds a list of every stitch that is listed in
-     * genericStitches and uniqueStitches.
-     * @return the list of {@link Composition} objects
-     */
-    public static List<Composition> getAllStitches() {
-        List<Composition> out = Lists.newArrayList();
-        genericStitches.forEach((key, value) -> out.addAll(value));
-        uniqueStitches.forEach((key, value) -> out.addAll(value));
+        out.addAll(((EntityCompositionsStorage) (Object) entity).getCompositions());
         return out;
     }
 }

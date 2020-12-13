@@ -2,12 +2,10 @@ package dev.lazurite.thimble.example.item;
 
 import dev.lazurite.thimble.Thimble;
 import dev.lazurite.thimble.example.composition.FloatAwayComposition;
-import dev.lazurite.thimble.example.composition.SmokeComposition;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.hit.HitResult;
@@ -23,7 +21,6 @@ import java.util.List;
  * @author Ethan Johnson
  */
 public class WandItem extends Item {
-
     /**
      * The default constructor.
      * @param settings the item settings
@@ -44,23 +41,14 @@ public class WandItem extends Item {
         ItemStack itemStack = user.getStackInHand(hand);
         HitResult hitResult = raycast(world, user, RaycastContext.FluidHandling.NONE);
 
-        if (world.isClient()) {
-            if (hitResult.getType() == HitResult.Type.MISS) {
+        if (!world.isClient()) {
+            /* Get a list of all entities in 16 blocks */
+            List<Entity> list = world.getOtherEntities(user, new Box(new BlockPos(hitResult.getPos())).expand(16));
 
-                /* Play a sound when the player right-clicks */
-                user.playSound(SoundEvents.BLOCK_ANVIL_HIT, 1.0f, 1.0f);
-            }
-        } else {
-            if (hitResult.getType() == HitResult.Type.MISS) {
+            /* Stitch a random composition to those entities */
+            list.forEach(entity -> Thimble.stitch(FloatAwayComposition::new, entity));
 
-                /* Get a list of all entities in a 32 block radius */
-                List<Entity> list = world.getOtherEntities(user, new Box(new BlockPos(hitResult.getPos())).expand(16));
-
-                /* Stitch a FloatAwayComposition to these entities */
-                list.forEach(entity -> Thimble.stitch(FloatAwayComposition::new, entity));
-
-                return TypedActionResult.success(itemStack);
-            }
+            return TypedActionResult.success(itemStack);
         }
 
         return TypedActionResult.pass(itemStack);
