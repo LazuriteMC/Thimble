@@ -51,13 +51,37 @@ allprojects {
 	tasks.withType(JavaCompile) {
 		options.encoding = "UTF-8"
 	}
+}
 
-	task sourcesJar(type: Jar, dependsOn: classes) {
-		classifier = "sources"
-		from sourceSets.main.allSource
+task sourcesJar(type: Jar, dependsOn: classes) {
+	classifier = "sources"
+	from sourceSets.main.allSource
+}
+
+jar {
+	from "LICENSE"
+}
+
+publishing {
+	publications {
+		mavenJava(MavenPublication) {
+			artifact(remapJar) {
+				builtBy remapJar
+			}
+			artifact(sourcesJar) {
+				builtBy remapSourcesJar
+			}
+		}
 	}
 
-	jar {
-		from "LICENSE"
+	repositories {
+		maven {
+			name = "GitHubPackages"
+			url = uri("https://maven.pkg.github.com/lazuriteMC/Thimble")
+			credentials {
+				username = project.findProperty("gpr.user")
+				password = project.findProperty("gpr.key")
+			}
+		}
 	}
 }
