@@ -26,6 +26,11 @@ public class Thimble {
     private static final Map<Identifier, CompositionFactory> registry = Maps.newConcurrentMap();
 
     /**
+     * A {@link java.util.HashMap} containing all generic {@link Composition} objects.
+     */
+    private static final Map<Class<? extends Entity>, List<CompositionFactory>> genericStitches = Maps.newConcurrentMap();
+
+    /**
      * The method called in order to register a {@link Composition}.
      * @param factory the {@link CompositionFactory} used to create a new {@link Composition} object
      */
@@ -74,6 +79,16 @@ public class Thimble {
     }
 
     /**
+     * Stitches a generic {@link Composition} to the given {@link Entity} class.
+     * @param factory the {@link CompositionFactory} to generate the {@link Composition}
+     * @param type the {@link Class} type of the {@link Entity}
+     */
+    public static void stitch(CompositionFactory factory, Class<? extends Entity> type) {
+        genericStitches.computeIfAbsent(type, k -> Lists.newArrayList());
+        genericStitches.get(type).add(factory);
+    }
+
+    /**
      * Gets all {@link Composition} objects associated with
      * the given {@link Entity}. Returns an empty list if there
      * are none.
@@ -82,5 +97,17 @@ public class Thimble {
      */
     public static List<Composition> getStitches(Entity entity) {
         return Lists.newArrayList(((EntityCompositionsStorage) (Object) entity).getCompositions());
+    }
+
+    /**
+     * Gets all {@link CompositionFactory} objects associated with
+     * the given {@link Entity} type. Returns an empty list if there
+     * are none.
+     * @param type the type of {@link Entity}
+     * @return a list {@link CompositionFactory} objects
+     */
+    public static List<CompositionFactory> getStitches(Class<? extends Entity> type) {
+        genericStitches.computeIfAbsent(type, k -> Lists.newArrayList());
+        return Lists.newArrayList(genericStitches.get(type));
     }
 }

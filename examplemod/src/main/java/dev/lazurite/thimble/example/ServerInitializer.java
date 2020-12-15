@@ -5,6 +5,7 @@ import dev.lazurite.thimble.example.composition.FloatAwayComposition;
 import dev.lazurite.thimble.example.composition.TimeBombComposition;
 import dev.lazurite.thimble.example.item.WandItem;
 import net.fabricmc.api.ModInitializer;
+import net.minecraft.entity.passive.SheepEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.util.Identifier;
@@ -23,13 +24,13 @@ public class ServerInitializer implements ModInitializer {
      */
     public static WandItem WAND_ITEM;
 
-    /*
-     * Register each composition. Make sure to do this statically
-     * and not inside of a method like onInitialize().
-     */
     static {
+        /* Register */
         Thimble.register(FloatAwayComposition::new);
         Thimble.register(TimeBombComposition::new);
+
+        /* Stitch a Generic Composition */
+        Thimble.stitch(FloatAwayComposition::new, SheepEntity.class);
     }
 
     /**

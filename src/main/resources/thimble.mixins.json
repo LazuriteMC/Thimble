@@ -4,7 +4,8 @@
   "package": "dev.lazurite.thimble.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
-    "EntityMixin"
+    "EntityMixin",
+    "ServerWorldMixin"
   ],
   "client": [],
   "injectors": {
