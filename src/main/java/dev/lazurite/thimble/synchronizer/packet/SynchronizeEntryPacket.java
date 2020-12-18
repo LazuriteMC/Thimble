@@ -11,6 +11,7 @@ import net.fabricmc.fabric.api.network.PacketContext;
 import net.fabricmc.fabric.api.network.ServerSidePacketRegistry;
 import net.fabricmc.fabric.api.server.PlayerStream;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
@@ -34,6 +35,8 @@ public class SynchronizeEntryPacket {
      * @param buf the contents of the packet
      */
     public static void accept(PacketContext context, PacketByteBuf buf) {
+        PlayerEntity player = context.getPlayer();
+
         /* The synchronizer's UUID */
         UUID synchronizerUuid = buf.readUuid();
 
@@ -43,16 +46,26 @@ public class SynchronizeEntryPacket {
         /* The entry to replace in the synchronizer */
         Synchronizer.Entry entry = new Synchronizer.Entry(key, key.getType().read(buf));
 
-        /* Get the entity */
-        Entity entity = context.getPlayer().getEntityWorld().getEntityById(buf.readInt());
+        /* Get the entity Id */
+        int entityId = buf.readInt();
 
         context.getTaskQueue().execute(() -> {
-            /* Find the right synchronizer and update it's entry */
-            for (Composition composition : Thimble.getStitches(entity)) {
-                Synchronizer synchronizer = composition.getSynchronizer();
+            if (player != null) {
+                World world = player.getEntityWorld();
 
-                if (synchronizer.getUuid().equals(synchronizerUuid)) {
-                    synchronizer.set(entry);
+                if (world != null) {
+                    Entity entity = world.getEntityById(entityId);
+
+                    if (entity != null) {
+                        /* Find the right synchronizer and update it's entry */
+                        for (Composition composition : Thimble.getStitches(entity)) {
+                            Synchronizer synchronizer = composition.getSynchronizer();
+
+                            if (synchronizer.getUuid().equals(synchronizerUuid)) {
+                                synchronizer.set(entry);
+                            }
+                        }
+                    }
                 }
             }
         });

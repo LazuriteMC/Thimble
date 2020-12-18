@@ -149,7 +149,7 @@ public class EntityMixin implements EntityCompositionsStorage {
 
         /* Gets all stitches associated with this entity */
         for (Composition composition : getCompositions()) {
-            if (composition.onInteract(player, hand)) {
+            if (composition.onInteract(entity, player, hand)) {
                 shouldSwingHand = true;
             }
         }
@@ -167,8 +167,9 @@ public class EntityMixin implements EntityCompositionsStorage {
      */
     @Inject(method = "remove", at = @At("HEAD"))
     public void remove(CallbackInfo info) {
-        /* Gets all stitches associated with this entity */
-        getCompositions().forEach(Composition::onRemove);
+        for (Composition composition : getCompositions()) {
+            composition.onRemove(entity);
+        }
     }
 
     /**
