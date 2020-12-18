@@ -61,6 +61,7 @@ public class FloatAwayComposition extends Composition {
 
     /**
      * Sets the {@link Entity} speed to zero.
+     * @param entity the {@link Entity} who has the {@link Composition} stitched
      * @param player the {@link PlayerEntity} who is interacting
      * @param hand the {@link Hand} of the {@link PlayerEntity}
      * @return whether or not the player should swing their hand
@@ -77,6 +78,7 @@ public class FloatAwayComposition extends Composition {
     /**
      * Called when the {@link Entity} is
      * removed from the {@link World}.
+     * @param entity the {@link Entity} who has the {@link Composition} stitched
      */
     @Override
     public void onRemove(Entity entity) {

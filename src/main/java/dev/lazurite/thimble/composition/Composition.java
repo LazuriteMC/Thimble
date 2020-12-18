@@ -38,6 +38,7 @@ public abstract class Composition {
     /**
      * Called whenever a {@link PlayerEntity} interacts with the
      * {@link Entity} that this {@link Composition} is stitched into.
+     * @param entity the {@link Entity} who has the {@link Composition} stitched
      * @param player the {@link PlayerEntity} who is interacting
      * @param hand the {@link Hand} of the {@link PlayerEntity}
      * @return whether or not the player should swing their hand
@@ -47,6 +48,7 @@ public abstract class Composition {
     /**
      * Called whenever the {@link Entity} is removed
      * from the {@link net.minecraft.world.World}.
+     * @param entity the {@link Entity} who has the {@link Composition} stitched
      */
     public abstract void onRemove(Entity entity);
 
