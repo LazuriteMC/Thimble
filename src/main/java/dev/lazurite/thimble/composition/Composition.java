@@ -42,13 +42,13 @@ public abstract class Composition {
      * @param hand the {@link Hand} of the {@link PlayerEntity}
      * @return whether or not the player should swing their hand
      */
-    public abstract boolean onInteract(PlayerEntity player, Hand hand);
+    public abstract boolean onInteract(Entity entity, PlayerEntity player, Hand hand);
 
     /**
      * Called whenever the {@link Entity} is removed
      * from the {@link net.minecraft.world.World}.
      */
-    public abstract void onRemove();
+    public abstract void onRemove(Entity entity);
 
     /**
      * Initializes the {@link Synchronizer}. This is where

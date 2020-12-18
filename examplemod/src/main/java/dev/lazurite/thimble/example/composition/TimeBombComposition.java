@@ -78,7 +78,7 @@ public class TimeBombComposition extends Composition {
      * @return whether or not the player should swing their hand
      */
     @Override
-    public boolean onInteract(PlayerEntity player, Hand hand) {
+    public boolean onInteract(Entity entity, PlayerEntity player, Hand hand) {
         if (player.getEntityWorld().isClient()) {
             getSynchronizer().set(ARMED, false);
         }
@@ -91,7 +91,7 @@ public class TimeBombComposition extends Composition {
      * removed from the {@link World}.
      */
     @Override
-    public void onRemove() {
+    public void onRemove(Entity entity) {
 
     }
 
